@@ -49,7 +49,7 @@ class PyTrailerWidget(QWidget):
         group = QButtonGroup(hbox)
         group.setExclusive(True)
         for cat in categories.keys():
-            but = QPushButton(cat, self, categories[cat])
+            but = QPushButton(cat, self)
             but.setCheckable(True)
             group.addButton(but)
             hbox.addWidget(but)
