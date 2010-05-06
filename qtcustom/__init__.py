@@ -1,5 +1,7 @@
 import subprocess
 import os
+import time
+import locale
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -16,7 +18,14 @@ class MovieItemWidget(QFrame):
         self.movie = movie
 
         self.titlebox = QHBoxLayout()
-        titleLabel = QLabel("<h2>%s</h2>" % movie.title, self)
+        locale.setlocale(locale.LC_ALL, "C")
+        releaseDate=None
+        if movie.releasedate:
+            releaseDate = time.strptime(movie.releasedate, "%a, %d %b %Y %H:%M:%S +0000")
+            locale.resetlocale()
+            releaseDate = time.strftime("%x", releaseDate)
+        titleLabel = QLabel("<h2>%s</h2> (Release date: %s)" %
+        (movie.title, releaseDate), self)
         self.setFrameStyle(QFrame.Panel | QFrame.Sunken);
 
         self.titlebox.addWidget(titleLabel)
@@ -29,6 +38,14 @@ class MovieItemWidget(QFrame):
 
         mainArea = QVBoxLayout()
         self.mainArea = mainArea
+        if movie.genre:
+            genStr = ", ".join(movie.genre)
+        else:
+            genStr = "Unknown"
+        genre = QLabel("<b>Genre(s): </b>%s" % genStr)
+        mainArea.addWidget(genre)
+        studio = QLabel("<b>Studio: </b>%s" % movie.studio)
+        mainArea.addWidget(studio)
         directors = QLabel("<b>Director(s): </b>%s" % ", ".join([movie.directors]))
         mainArea.addWidget(directors)
         actors = QLabel("<b>Actors: </b>%s" % ", ".join(movie.actors))
