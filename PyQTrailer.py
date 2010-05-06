@@ -1,9 +1,8 @@
+#!/usr/bin/python
+
 import sys
-import os
 import pickle
-import time
 from multiprocessing import Process, Queue
-import subprocess
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

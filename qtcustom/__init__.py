@@ -74,8 +74,7 @@ class MovieItemWidget(QFrame):
 
     def downloadClicked(self, button):
         id = self.downloadButtons.id(button)
-        print id
-        os.chdir('/data/downloads/torrents')
+        os.chdir('/data/')
         subprocess.Popen(['wget','-U','QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)', self.movie.trailerLinks[id]])
 
 
