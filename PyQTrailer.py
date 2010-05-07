@@ -1,8 +1,10 @@
 #!/usr/bin/python
 
 import sys
+import os
 import pickle
 from multiprocessing import Process, Queue
+import ConfigParser as configparser
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -19,10 +21,14 @@ categories = {'Just added':'/trailers/home/feeds/just_added.json',
               'Search':'/trailers/home/scripts/quickfind.php?callback=searchCallback&q='}
 
 
-class PyTrailerWidget(QWidget):
+class PyTrailerWidget(QMainWindow):
+    configPath = '%s/.pyqtrailer' % os.path.expanduser('~')
+    
     def __init__(self, *args):
-        QWidget.__init__(self, *args)
+        QMainWindow.__init__(self, *args)
         READ_AHEAD_PROC=4
+        self.config = configparser.SafeConfigParser({'downloadDir':'/tmp'})
+        self.config.read(self.configPath)
         self.movieDict = {}
         self.readAheadTaskQueue = Queue()
         self.readAheadDoneQueue = Queue()
@@ -36,13 +42,14 @@ class PyTrailerWidget(QWidget):
             self.readAheadProcess.append(p)
 
         self.init_widget()
+        self.init_menus()
 
     def init_widget(self):
 
         self.refreshTimer = QTimer(self)
         self.refreshTimer.timeout.connect(self.refreshMovies)
-        self.refreshTimer.start(500)
-        self.setWindowTitle("PyTrailer - Apple Trailer Downloader")
+        self.refreshTimer.start(1000)
+        self.setWindowTitle(self.tr("PyTrailer - Apple Trailer Downloader"))
 
         hbox = QHBoxLayout()
         group = QButtonGroup(hbox)
@@ -75,12 +82,38 @@ class PyTrailerWidget(QWidget):
         self.loadGroup("Just added")
 
 
-        shortcut = QShortcut(QKeySequence(self.tr("Ctrl+Q", "File|Quit")),
-                          self);
-        self.connect(shortcut, SIGNAL('activated()'), SLOT('close()'))
 
         self.setLayout(vbox)
+        self.setCentralWidget(scrollArea)
 
+    def init_menus(self):
+        fileMenu = self.menuBar().addMenu(self.tr("&File"));
+
+        fileMenu.addAction(self.tr("Settings"), self.settings,
+                           QKeySequence(self.tr("Ctrl+S",
+                                                "File|Settings")))
+        fileMenu.addAction(self.tr("Quit"), self.close,
+                           QKeySequence(self.tr("Ctrl+Q",
+                                                "File|Quit")))
+
+        movieMenu = self.menuBar().addMenu(self.tr("&Movies"))
+        i=1
+        for cat in categories.keys():
+            movieMenu.addAction(self.tr(cat), self.slotCreate(cat),
+                                QKeySequence(self.tr("F%d" % i,
+                                "Movies|%s" % cat)))
+            i = i + 1
+
+    def settings(self):
+        d = PyTrailerSettings(self.config)
+        if d.exec_() == QDialog.Accepted:
+            self.config.set("DEFAULT","downloadDir",str(d.downloadPath.text()))
+            self.saveConfig()
+
+    def slotCreate(self, group):
+        def slot():
+            self.loadGroup(group)
+        return slot
 
     def groupChange(self, button):
         self.loadGroup(str(button.text()))
@@ -108,8 +141,12 @@ class PyTrailerWidget(QWidget):
             w=MovieItemWidget(movie, self.scrollArea)
             self.movieDict[movie.title] = w
             self.mainArea.addWidget(w)
+    def saveConfig(self):
+        with open(self.configPath, 'wb') as configfile:
+            self.config.write(configfile)
 
     def closeEvent(self, closeEvent):
+        self.saveConfig()
         for p in self.readAheadProcess:
             p.terminate()
 

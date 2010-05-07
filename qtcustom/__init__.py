@@ -94,4 +94,25 @@ class MovieItemWidget(QFrame):
         os.chdir('/data/')
         subprocess.Popen(['wget','-U','QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)', self.movie.trailerLinks[id]])
 
+class PyTrailerSettings(QDialog):
+    def __init__(self, config):
+        QDialog.__init__(self)
+        self.config = config
+        label = QLabel(self.tr("&Download path"))
+        self.downloadPath = QLineEdit(self)
+        self.downloadPath.setText(config.get("DEFAULT","downloadDir"))
+        label.setBuddy(self.downloadPath)
 
+        hbox = QHBoxLayout()
+        hbox.addWidget(label)
+        hbox.addWidget(self.downloadPath)
+
+        buttonBox = QDialogButtonBox(QDialogButtonBox.Ok
+                                      | QDialogButtonBox.Cancel);
+
+        self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"));
+        self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"));
+        vbox = QVBoxLayout()
+        vbox.addLayout(hbox)
+        vbox.addWidget(buttonBox)
+        self.setLayout(vbox)
