@@ -60,7 +60,6 @@ class MovieItemWidget(QFrame):
         topLevelLayout = QVBoxLayout()
         topLevelLayout.addLayout(self.titlebox)
         topLevelLayout.addLayout(middleArea)
-        topLevelLayout.addStretch(1)
         self.setMinimumSize(400,150)
         self.setLayout(topLevelLayout)
 
@@ -88,6 +87,10 @@ class MovieItemWidget(QFrame):
             hbox.addWidget(button)
             self.mainArea.addLayout(hbox)
             links = links + 1
+        desc = QLabel(movie.description)
+        desc.setWordWrap(True)
+        desc.setTextFormat(Qt.RichText)
+        self.layout().addWidget(desc)
 
     def downloadClicked(self, button):
         id = self.downloadButtons.id(button)

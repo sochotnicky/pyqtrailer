@@ -83,7 +83,6 @@ class PyTrailerWidget(QMainWindow):
 
 
 
-        self.setLayout(vbox)
         self.setCentralWidget(scrollArea)
 
     def init_menus(self):
@@ -141,6 +140,7 @@ class PyTrailerWidget(QMainWindow):
             w=MovieItemWidget(movie, self.scrollArea)
             self.movieDict[movie.title] = w
             self.mainArea.addWidget(w)
+
     def saveConfig(self):
         with open(self.configPath, 'wb') as configfile:
             self.config.write(configfile)
@@ -157,6 +157,7 @@ class PyTrailerWidget(QMainWindow):
             oldMovie = self.movieList[i]
             oldMovie.poster = updatedMovie.poster
             oldMovie.trailerLinks = updatedMovie.trailerLinks
+            oldMovie.description = updatedMovie.description
             oldMovie.cached = True
             if self.movieDict.has_key(oldMovie.title):
                 w = self.movieDict[oldMovie.title]
@@ -170,9 +171,10 @@ def movieReadAhead(taskQueue, doneQueue):
         try:
             movie.poster
             movie.trailerLinks
+            movie.description
             doneQueue.put((i, movie))
         except:
-            pass
+            raise
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
