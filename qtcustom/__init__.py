@@ -64,6 +64,9 @@ class MovieItemWidget(QFrame):
         self.setLayout(topLevelLayout)
 
     def refresh(self):
+        if not self.isVisible():
+            return
+
         movie = self.movie
 
         posterImage = QImage()
@@ -71,7 +74,7 @@ class MovieItemWidget(QFrame):
         self.posterLabel.setPixmap(QPixmap.fromImage(posterImage))
 
         self.downloadButtons = QButtonGroup()
-        self.downloadButtons.buttonClicked.connect(self.downloadClicked)
+        self.downloadButtons.buttonClicked.connect(self.download)
         links = 0
         for trailerLink in movie.trailerLinks:
             label = '%s' % trailerLink.split('/')[-1]
@@ -92,10 +95,11 @@ class MovieItemWidget(QFrame):
         desc.setTextFormat(Qt.RichText)
         self.layout().addWidget(desc)
 
-    def downloadClicked(self, button):
+    downloadClicked = pyqtSignal((QString, ))
+
+    def download(self, button):
         id = self.downloadButtons.id(button)
-        os.chdir('/data/')
-        subprocess.Popen(['wget','-U','QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)', self.movie.trailerLinks[id]])
+        self.downloadClicked.emit(self.movie.trailerLinks[id])
 
 class PyTrailerSettings(QDialog):
     def __init__(self, config):

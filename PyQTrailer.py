@@ -80,9 +80,6 @@ class PyTrailerWidget(QMainWindow):
         scrollArea.setMinimumSize(QSize(400,150))
         self.mainArea = mlistLayout
         self.loadGroup("Just added")
-
-
-
         self.setCentralWidget(scrollArea)
 
     def init_menus(self):
@@ -138,6 +135,7 @@ class PyTrailerWidget(QMainWindow):
 
         for movie in self.movieList:
             w=MovieItemWidget(movie, self.scrollArea)
+            w.downloadClicked.connect(self.downloadTrailer)
             self.movieDict[movie.title] = w
             self.mainArea.addWidget(w)
 
@@ -164,8 +162,20 @@ class PyTrailerWidget(QMainWindow):
                 if w is not None:
                     w.refresh()
 
+    def downloadTrailer(self, url):
+        subprocess.Popen(['wget','-cN',
+                          '-U',
+                          'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)',
+                          url,
+                          '-P',
+                          self.config.get("DEFAULT","downloadDir")])
+
+
 
 def movieReadAhead(taskQueue, doneQueue):
+    """Function to be run in separate process,
+    caching additional movie information
+    """
     while True:
         i, movie = taskQueue.get()
         try:
