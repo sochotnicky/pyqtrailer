@@ -1,4 +1,5 @@
 import subprocess
+import pickle
 import os
 import time
 import locale
@@ -12,10 +13,11 @@ class CategoryPushButton(QPushButton):
         self.jsonLink = jsonLink
 
 class MovieItemWidget(QFrame):
-    def __init__(self, movie, *args):
+    def __init__(self, movie, trailerFilter, *args):
         QWidget.__init__(self, *args)
 
         self.movie = movie
+        self.filter = trailerFilter
 
         self.titlebox = QHBoxLayout()
         locale.setlocale(locale.LC_ALL, "C")
@@ -77,6 +79,9 @@ class MovieItemWidget(QFrame):
         self.downloadButtons.buttonClicked.connect(self.download)
         links = 0
         for trailerLink in movie.trailerLinks:
+            if not self.filter.visible(trailerLink):
+                links = links + 1
+                continue
             label = '%s' % trailerLink.split('/')[-1]
             label = label[:label.rindex('.mov')]
             lab = QLabel('<a href="%s">%s</a>' % (trailerLink, label),self)
@@ -110,16 +115,72 @@ class PyTrailerSettings(QDialog):
         self.downloadPath.setText(config.get("DEFAULT","downloadDir"))
         label.setBuddy(self.downloadPath)
 
+        browseBut = QPushButton(self.tr("&Browse"))
+        browseBut.clicked.connect(self.browseDir)
+
         hbox = QHBoxLayout()
         hbox.addWidget(label)
         hbox.addWidget(self.downloadPath)
+        hbox.addWidget(browseBut)
 
+        vbox = QVBoxLayout()
+        vbox.addLayout(hbox)
+        hbox = QHBoxLayout()
+        self.filters = [('all','.*mov.*'),
+                   ('320x180',r'.*h320\.mov.*'),
+                   ('480x204',r'.*h480\.mov.*'),
+                   ('640x360',r'.*h640\.mov.*'),
+                   ('480p',r'.*480p\.mov.*'),
+                   ('720p',r'.*720p\.mov.*'),
+                   ('1080p',r'.*1080p\.mov.*')]
+        activeFilters = pickle.loads(config.get("DEFAULT","filters"))
+        filterLayout = QVBoxLayout()
+        filterGroup = QGroupBox(self.tr("Trailer quality filter"))
+        filterGroup.setLayout(filterLayout)
+        vbox.addWidget(filterGroup)
+        self.filterButtons = []
+        for qual, filt in self.filters:
+            active = False
+            if filt in activeFilters:
+                active = True
+            option = QCheckBox(qual)
+            option.setChecked(active)
+            self.filterButtons.append(option)
+            filterLayout.addWidget(option)
+
+        self.filterButtons[0].clicked.connect(self.refreshFilters)
         buttonBox = QDialogButtonBox(QDialogButtonBox.Ok
                                       | QDialogButtonBox.Cancel);
 
         self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"));
         self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"));
-        vbox = QVBoxLayout()
-        vbox.addLayout(hbox)
         vbox.addWidget(buttonBox)
         self.setLayout(vbox)
+        self.refreshFilters()
+
+    def refreshFilters(self):
+        for button in self.filterButtons[1:]:
+            button.setEnabled(not self.filterButtons[0].isChecked())
+
+
+    def accept(self):
+        self.config.set("DEFAULT","downloadDir",
+                        str(self.downloadPath.text()))
+        activeFilters = []
+        ind = 0
+        for button in self.filterButtons:
+            if button.isChecked():
+                activeFilters.append(self.filters[ind][1])
+            ind = ind + 1
+        self.config.set("DEFAULT","filters",pickle.dumps(activeFilters))
+        QDialog.accept(self)
+
+    def browseDir(self):
+        directory = QFileDialog.getExistingDirectory(self,
+                                                     QString(),
+                                                     self.config.get("DEFAULT",
+                                                                     "downloadDir"))
+        if directory:
+            self.downloadPath.setText(directory)
+
+

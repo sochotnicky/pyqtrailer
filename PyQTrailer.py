@@ -2,6 +2,7 @@
 
 import sys
 import os
+import re
 import pickle
 from multiprocessing import Process, Queue
 import ConfigParser as configparser
@@ -23,11 +24,12 @@ categories = {'Just added':'/trailers/home/feeds/just_added.json',
 
 class PyTrailerWidget(QMainWindow):
     configPath = '%s/.pyqtrailer' % os.path.expanduser('~')
-    
+
     def __init__(self, *args):
         QMainWindow.__init__(self, *args)
         READ_AHEAD_PROC=4
-        self.config = configparser.SafeConfigParser({'downloadDir':'/tmp'})
+        self.config = configparser.SafeConfigParser({'downloadDir':'/tmp',
+                                       'filters':pickle.dumps([])})
         self.config.read(self.configPath)
         self.movieDict = {}
         self.readAheadTaskQueue = Queue()
@@ -103,7 +105,6 @@ class PyTrailerWidget(QMainWindow):
     def settings(self):
         d = PyTrailerSettings(self.config)
         if d.exec_() == QDialog.Accepted:
-            self.config.set("DEFAULT","downloadDir",str(d.downloadPath.text()))
             self.saveConfig()
 
     def slotCreate(self, group):
@@ -132,9 +133,15 @@ class PyTrailerWidget(QMainWindow):
         self.movieList = amt.getMoviesFromJSON(url)
         for i in range(len(self.movieList)):
             self.readAheadTaskQueue.put((i, self.movieList[i]))
+        filt = TrailerFilter()
+        filters = pickle.loads(self.config.get("DEFAULT",'filters'))
+        for trailerFilter in filters:
+            filt.addCondition(trailerFilter)
+        if len(filters) == 0:
+            filt.addCondition(".*")
 
         for movie in self.movieList:
-            w=MovieItemWidget(movie, self.scrollArea)
+            w=MovieItemWidget(movie, filt, self.scrollArea)
             w.downloadClicked.connect(self.downloadTrailer)
             self.movieDict[movie.title] = w
             self.mainArea.addWidget(w)
@@ -171,6 +178,25 @@ class PyTrailerWidget(QMainWindow):
                           self.config.get("DEFAULT","downloadDir")])
 
 
+class TrailerFilter(object):
+    """Class to create filter so that we can show only
+    some of the trailers (only HD/only 480p etc)
+    """
+    def __init__(self):
+        self.conditions=[]
+
+    def addCondition(self, regex):
+        """Adds another condition that makes movie visible
+        """
+        self.conditions.append(re.compile(regex))
+
+    def visible(self, trailerURL):
+        """Class returns true if the trailer should be visible
+        """
+        for cond in self.conditions:
+            if re.match(cond, trailerURL):
+                return True
+        return False
 
 def movieReadAhead(taskQueue, doneQueue):
     """Function to be run in separate process,
