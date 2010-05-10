@@ -1,0 +1,14 @@
+#!/usr/bin/python
+
+import sys
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
+from pyqtrailer.main import PyTrailerWidget
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    widget = PyTrailerWidget()
+    widget.resize(800, 600)
+    widget.show()
+    sys.exit(app.exec_())

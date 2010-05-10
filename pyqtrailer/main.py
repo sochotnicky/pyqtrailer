@@ -1,4 +1,3 @@
-#!/usr/bin/python
 
 import sys
 import os
@@ -12,7 +11,7 @@ from PyQt4.QtGui import *
 
 
 from qtcustom import *
-import amt
+import pytrailer as amt
 
 
 categories = {'Just added':'/trailers/home/feeds/just_added.json',
