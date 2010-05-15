@@ -160,6 +160,7 @@ class PyTrailerWidget(QMainWindow):
 
         for movie in self.movieList:
             w=MovieItemWidget(movie, filt, self.scrollArea)
+            w.setVisible(False)
             w.downloadClicked.connect(self.downloadTrailer)
             self.movieDict[movie.title] = w
             self.mainArea.addWidget(w)
@@ -188,6 +189,7 @@ class PyTrailerWidget(QMainWindow):
                 w = self.movieDict[oldMovie.title]
                 if w is not None:
                     w.refresh()
+                    w.setVisible(True)
 
     def refreshDownloadStatus(self):
 

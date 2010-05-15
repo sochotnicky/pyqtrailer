@@ -64,8 +64,6 @@ class MovieItemWidget(QFrame):
         self.setLayout(topLevelLayout)
 
     def refresh(self):
-        if not self.isVisible():
-            return
 
         movie = self.movie
 
