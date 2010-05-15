@@ -5,6 +5,7 @@ import re
 import pickle
 import multiprocessing
 import ConfigParser as configparser
+import random
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -147,10 +148,11 @@ class PyTrailerWidget(QMainWindow):
             if cat == groupName:
                 url = "http://trailers.apple.com%s" % catURL
         self.unloadCurrentGroup()
+        self.loadID = random.random()
 
         self.movieList = amt.getMoviesFromJSON(url)
         for i in range(len(self.movieList)):
-            self.readAheadTaskQueue.put((i, self.movieList[i]))
+            self.readAheadTaskQueue.put((i, self.movieList[i], self.loadID))
         filt = TrailerFilter()
         filters = pickle.loads(self.config.get("DEFAULT",'filters'))
         for trailerFilter in filters:
@@ -179,7 +181,9 @@ class PyTrailerWidget(QMainWindow):
         changed = False
         self.refreshDownloadStatus()
         while not self.readAheadDoneQueue.empty():
-            i, updatedMovie = self.readAheadDoneQueue.get_nowait()
+            i, updatedMovie, loadID = self.readAheadDoneQueue.get_nowait()
+            if self.loadID != loadID:
+                continue
             oldMovie = self.movieList[i]
             oldMovie.poster = updatedMovie.poster
             oldMovie.trailerLinks = updatedMovie.trailerLinks
@@ -248,12 +252,12 @@ def movieReadAhead(taskQueue, doneQueue):
     caching additional movie information
     """
     while True:
-        i, movie = taskQueue.get()
+        i, movie, loadID = taskQueue.get()
         try:
             movie.poster
             movie.trailerLinks
             movie.description
-            doneQueue.put((i, movie))
+            doneQueue.put((i, movie, loadID))
         except:
             raise
 
