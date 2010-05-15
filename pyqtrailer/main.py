@@ -3,7 +3,7 @@ import sys
 import os
 import re
 import pickle
-from multiprocessing import Process, Queue
+import multiprocessing
 import ConfigParser as configparser
 
 from PyQt4.QtCore import *
@@ -12,7 +12,7 @@ from PyQt4.QtGui import *
 
 from qtcustom import *
 import pytrailer as amt
-
+from downloader import TrailerDownloader, DownloadStatus
 
 categories = {'Just added':'/trailers/home/feeds/just_added.json',
               'Exclusive':'/trailers/home/feeds/exclusive.json',
@@ -31,17 +31,23 @@ class PyTrailerWidget(QMainWindow):
                                        'filters':pickle.dumps([])})
         self.config.read(self.configPath)
         self.movieDict = {}
-        self.readAheadTaskQueue = Queue()
-        self.readAheadDoneQueue = Queue()
+        self.readAheadTaskQueue = multiprocessing.Queue()
+        self.readAheadDoneQueue = multiprocessing.Queue()
+        self.trailerDownloadQueue = multiprocessing.Queue()
+        self.trailerDownloadDict = multiprocessing.Manager().dict()
 
         self.readAheadProcess = []
         for i in range(READ_AHEAD_PROC):
-            p = Process(target=movieReadAhead,
+            p = multiprocessing.Process(target=movieReadAhead,
                         args=(self.readAheadTaskQueue,
                               self.readAheadDoneQueue))
             p.start()
             self.readAheadProcess.append(p)
 
+        self.downloader = TrailerDownloader(self.trailerDownloadQueue,
+                               self.trailerDownloadDict,
+                               2)
+        self.downloader.start()
         self.init_widget()
         self.init_menus()
 
@@ -151,11 +157,13 @@ class PyTrailerWidget(QMainWindow):
 
     def closeEvent(self, closeEvent):
         self.saveConfig()
+        self.downloader.stop()
         for p in self.readAheadProcess:
             p.terminate()
 
     def refreshMovies(self):
         changed = False
+        self.refreshDownloadStatus()
         while not self.readAheadDoneQueue.empty():
             i, updatedMovie = self.readAheadDoneQueue.get_nowait()
             oldMovie = self.movieList[i]
@@ -168,13 +176,15 @@ class PyTrailerWidget(QMainWindow):
                 if w is not None:
                     w.refresh()
 
+    def refreshDownloadStatus(self):
+        for i in self.trailerDownloadDict.keys():
+            item = self.trailerDownloadDict[i]
+            if item.status == DownloadStatus.IN_PROGRESS:
+                print item.percent
+
     def downloadTrailer(self, url):
-        subprocess.Popen(['wget','-cN',
-                          '-U',
-                          'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)',
-                          url,
-                          '-P',
-                          self.config.get("DEFAULT","downloadDir")])
+        self.trailerDownloadQueue.put((str(url),
+                                      self.config.get("DEFAULT","downloadDir")))
 
 
 class TrailerFilter(object):
@@ -210,6 +220,7 @@ def movieReadAhead(taskQueue, doneQueue):
             doneQueue.put((i, movie))
         except:
             raise
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
