@@ -58,6 +58,7 @@ class PyTrailerWidget(QMainWindow):
         self.refreshTimer.start(1000)
         self.setWindowTitle(self.tr("PyTrailer - Apple Trailer Downloader"))
 
+        centralWidget = QWidget()
         hbox = QHBoxLayout()
         group = QButtonGroup(hbox)
         group.setExclusive(True)
@@ -69,25 +70,34 @@ class PyTrailerWidget(QMainWindow):
 
         group.buttonClicked.connect(self.groupChange)
 
-        self.scrollArea = QScrollArea(self)
+        self.scrollArea = QScrollArea(centralWidget)
         scrollArea = self.scrollArea
-        self.scrolledWidget = QWidget(self)
+        self.scrolledWidget = QWidget(scrollArea)
         scrolledWidget = self.scrolledWidget
         self.hackTmp = scrolledWidget
-        scrollArea.setSizePolicy(QSizePolicy.Ignored,
-                QSizePolicy.Ignored)
 
+
+        statusView = QTreeWidget(centralWidget)
+        statusView.setMaximumHeight(200)
+        statusView.setHeaderLabels(["Trailer","Download status"])
+        statusView.setVisible(False)
+        statusView.setRootIsDecorated(False)
+        statusView.setColumnWidth(0, self.width()-200)
+        self.statusView = statusView
         vbox = QVBoxLayout()
         vbox.addLayout(hbox)
         vbox.addWidget(scrollArea)
+        vbox.addWidget(statusView)
         mlistLayout = QVBoxLayout()
         scrolledWidget.setLayout(mlistLayout)
         scrollArea.setWidget(scrolledWidget)
         scrollArea.setWidgetResizable(True)
-        scrollArea.setMinimumSize(QSize(400,150))
+        scrollArea.setMinimumSize(QSize(400,350))
+
         self.mainArea = mlistLayout
         self.loadGroup("Just added")
-        self.setCentralWidget(scrollArea)
+        centralWidget.setLayout(vbox)
+        self.setCentralWidget(centralWidget)
 
     def init_menus(self):
         fileMenu = self.menuBar().addMenu(self.tr("&File"));
@@ -177,10 +187,31 @@ class PyTrailerWidget(QMainWindow):
                     w.refresh()
 
     def refreshDownloadStatus(self):
+
         for i in self.trailerDownloadDict.keys():
             item = self.trailerDownloadDict[i]
+            trailerName = item.url.split('/')[-1]
+            statusText = None
             if item.status == DownloadStatus.IN_PROGRESS:
-                print item.percent
+                statusText = "%d %% done" % item.percent
+            elif item.status == DownloadStatus.DONE:
+                statusText = "Done"
+            elif item.status == DownloadStatus.ERROR:
+                statusText = "Error"
+            else:
+                statusText = "Unknown"
+
+            match = self.statusView.findItems(trailerName,Qt.MatchExactly)
+            if match and len(match) > 0:
+                match = match[0]
+                match.setText(1, statusText)
+            else:
+                match = QTreeWidgetItem([trailerName, statusText])
+                self.statusView.addTopLevelItem(match)
+
+
+        if len(self.trailerDownloadDict.keys()) and not self.statusView.isVisible():
+            self.statusView.setVisible(True)
 
     def downloadTrailer(self, url):
         self.trailerDownloadQueue.put((str(url),
