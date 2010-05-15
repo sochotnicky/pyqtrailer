@@ -1,6 +1,4 @@
-import subprocess
 import pickle
-import os
 import time
 import locale
 
