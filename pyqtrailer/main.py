@@ -14,11 +14,11 @@ from qtcustom import *
 import pytrailer as amt
 from downloader import TrailerDownloader, DownloadStatus
 
-categories = {'Just added':'/trailers/home/feeds/just_added.json',
-              'Exclusive':'/trailers/home/feeds/exclusive.json',
-              'Only HD':'/trailers/home/feeds/just_hd.json',
-              'Most popular':'/trailers/home/feeds/most_pop.json',
-              'Search':'/trailers/home/scripts/quickfind.php?callback=searchCallback&q='}
+categories = [('Just added', '/trailers/home/feeds/just_added.json'),
+              ('Exclusive', '/trailers/home/feeds/exclusive.json'),
+              ('Only HD', '/trailers/home/feeds/just_hd.json'),
+              ('Most popular', '/trailers/home/feeds/most_pop.json'),
+              ('Search', '/trailers/home/scripts/quickfind.php?callback=searchCallback&q=')]
 
 
 class PyTrailerWidget(QMainWindow):
@@ -62,7 +62,7 @@ class PyTrailerWidget(QMainWindow):
         hbox = QHBoxLayout()
         group = QButtonGroup(hbox)
         group.setExclusive(True)
-        for cat in categories.keys():
+        for cat, url in categories:
             but = QPushButton(cat, self)
             but.setCheckable(True)
             group.addButton(but)
@@ -111,7 +111,7 @@ class PyTrailerWidget(QMainWindow):
 
         movieMenu = self.menuBar().addMenu(self.tr("&Movies"))
         i=1
-        for cat in categories.keys():
+        for cat, url in categories:
             movieMenu.addAction(self.tr(cat), self.slotCreate(cat),
                                 QKeySequence(self.tr("F%d" % i,
                                 "Movies|%s" % cat)))
@@ -142,9 +142,12 @@ class PyTrailerWidget(QMainWindow):
             widget = self.mainArea.takeAt(0)
 
     def loadGroup(self, groupName):
+        url = None
+        for cat, catURL in categories:
+            if cat == groupName:
+                url = "http://trailers.apple.com%s" % catURL
         self.unloadCurrentGroup()
 
-        url = "http://trailers.apple.com%s" % categories[groupName]
         self.movieList = amt.getMoviesFromJSON(url)
         for i in range(len(self.movieList)):
             self.readAheadTaskQueue.put((i, self.movieList[i]))
