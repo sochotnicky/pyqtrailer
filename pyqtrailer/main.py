@@ -156,6 +156,8 @@ class PyTrailerWidget(QMainWindow):
         for cat, catURL in categories:
             if cat == groupName:
                 url = "http://trailers.apple.com%s" % catURL
+                break
+
         self.unloadCurrentGroup()
         self.loadID = random.random()
 
