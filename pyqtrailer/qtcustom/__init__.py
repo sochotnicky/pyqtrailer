@@ -8,11 +8,6 @@ from about_ui import Ui_AboutDialog
 from .. import version
 __version__ = version.__version__
 
-class CategoryPushButton(QPushButton):
-    def __init__(self, text, parent, jsonLink):
-        QPushButton.__init__(self, text, parent)
-        self.jsonLink = jsonLink
-
 class MovieItemWidget(QFrame):
     def __init__(self, movie, trailerFilter, *args):
         QWidget.__init__(self, *args)
