@@ -5,6 +5,8 @@ import locale
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from about_ui import Ui_AboutDialog
+from .. import version
+__version__ = version.__version__
 
 class CategoryPushButton(QPushButton):
     def __init__(self, text, parent, jsonLink):
@@ -187,5 +189,6 @@ class PyTrailerAbout(QDialog):
         self.ui = Ui_AboutDialog()
         self.ui.setupUi(self)
         self._main  = parent
+        self.ui.label_version.setText(__version__)
         self.connect(self.ui.buttonClose, SIGNAL("clicked(bool)"), self.close)
 

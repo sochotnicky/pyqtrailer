@@ -1,7 +1,8 @@
 from distutils.core import setup
+import pyqtrailer
 
 setup(name='pyqtrailer',
-      version='0.2.2',
+      version=pyqtrailer.__version__,
       description='PyQt4 application to download trailers from www.apple.com/trailers',
       author='Stanislav Ochotnicky',
       author_email='sochotnicky@gmail.com',
