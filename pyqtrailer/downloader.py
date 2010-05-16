@@ -3,6 +3,7 @@ from multiprocessing import Process, Queue, active_children
 import subprocess
 import os
 import signal
+import locale
 
 class ClosingException(Exception):
     pass
@@ -52,6 +53,8 @@ class TrailerDownloader(object):
 
 
 def trailerDownload(taskQueue, taskDict):
+    # we need to have consistent wget output
+    locale.setlocale(locale.LC_ALL, "C")
     signal.signal(signal.SIGTERM, term_handler)
     try:
         while True:
