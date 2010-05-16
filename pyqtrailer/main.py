@@ -117,11 +117,20 @@ class PyTrailerWidget(QMainWindow):
                                 QKeySequence(self.tr("F%d" % i,
                                 "Movies|%s" % cat)))
             i = i + 1
+        aboutMenu = self.menuBar().addMenu(self.tr("&Help"))
+
+        aboutMenu.addAction(self.tr("&About"),
+                            self.about,
+                            QKeySequence(self.tr("Ctrl+A",
+                                                 "Help|About PyQTrailer")))
 
     def settings(self):
         d = PyTrailerSettings(self.config)
         if d.exec_() == QDialog.Accepted:
             self.saveConfig()
+    def about(self):
+        w = PyTrailerAbout(self)
+        w.exec_()
 
     def slotCreate(self, group):
         def slot():

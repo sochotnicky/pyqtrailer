@@ -4,6 +4,7 @@ import locale
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from about_ui import Ui_AboutDialog
 
 class CategoryPushButton(QPushButton):
     def __init__(self, text, parent, jsonLink):
@@ -179,4 +180,12 @@ class PyTrailerSettings(QDialog):
         if directory:
             self.downloadPath.setText(directory)
 
+
+class PyTrailerAbout(QDialog):
+    def __init__(self, parent):
+        QDialog.__init__(self)
+        self.ui = Ui_AboutDialog()
+        self.ui.setupUi(self)
+        self._main  = parent
+        self.connect(self.ui.buttonClose, SIGNAL("clicked(bool)"), self.close)
 
