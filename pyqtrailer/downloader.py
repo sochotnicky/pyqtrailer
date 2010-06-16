@@ -10,9 +10,10 @@ class ClosingException(Exception):
 
 
 class DownloadStatus:
-    DONE=1
-    ERROR=2
-    IN_PROGRESS=3
+    DONE = 1
+    ERROR = 2
+    IN_PROGRESS = 3
+    WAITING = 4
 
     def __init__(self, url, status, percent=0):
         self.status = status

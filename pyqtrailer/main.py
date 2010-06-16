@@ -218,6 +218,8 @@ class PyTrailerWidget(QMainWindow):
                 statusText = "Done"
             elif item.status == DownloadStatus.ERROR:
                 statusText = "Error"
+            elif item.status == DownloadStatus.WAITING:
+                statusText = "Waiting"
             else:
                 statusText = "Unknown"
 
@@ -236,6 +238,8 @@ class PyTrailerWidget(QMainWindow):
     def downloadTrailer(self, url):
         self.trailerDownloadQueue.put((str(url),
                                       self.config.get("DEFAULT","downloadDir")))
+        self.trailerDownloadDict[url] = DownloadStatus(url,
+                           DownloadStatus.WAITING)
 
 
 class TrailerFilter(object):
