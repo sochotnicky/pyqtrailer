@@ -19,7 +19,7 @@ class MovieItemWidget(QFrame):
         locale.setlocale(locale.LC_ALL, "C")
         releaseDate=None
         if movie.releasedate:
-            releaseDate = time.strptime(movie.releasedate, "%a, %d %b %Y %H:%M:%S +0000")
+            releaseDate = time.strptime(movie.releasedate, "%a, %d %b %Y %H:%M:%S %z")
             locale.resetlocale()
             releaseDate = time.strftime("%x", releaseDate)
         titleLabel = QLabel("<h2>%s</h2> (Release date: %s)" %
