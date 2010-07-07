@@ -27,7 +27,7 @@ class PyTrailerWidget(QMainWindow):
 
     def __init__(self, *args):
         QMainWindow.__init__(self, *args)
-        READ_AHEAD_PROC=4
+        READ_AHEAD_PROC = 4
         self.config = configparser.SafeConfigParser({'downloadDir':'/tmp',
                                        'filters':pickle.dumps([])})
         self.config.read(self.configPath)
@@ -101,7 +101,7 @@ class PyTrailerWidget(QMainWindow):
         self.setCentralWidget(centralWidget)
 
     def init_menus(self):
-        fileMenu = self.menuBar().addMenu(self.tr("&File"));
+        fileMenu = self.menuBar().addMenu(self.tr("&File"))
 
         fileMenu.addAction(self.tr("Settings"), self.settings,
                            QKeySequence(self.tr("Ctrl+S",
@@ -238,7 +238,7 @@ class PyTrailerWidget(QMainWindow):
     def downloadTrailer(self, url):
         self.trailerDownloadQueue.put((str(url),
                                       self.config.get("DEFAULT","downloadDir")))
-        self.trailerDownloadDict[url] = DownloadStatus(url,
+        self.trailerDownloadDict[str(url)] = DownloadStatus(str(url),
                            DownloadStatus.WAITING)
 
 
