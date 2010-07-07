@@ -7,6 +7,7 @@ from PyQt4.QtGui import *
 from about_ui import Ui_AboutDialog
 from .. import version
 __version__ = version.__version__
+import dateutil.parser as dparser
 
 class MovieItemWidget(QFrame):
     def __init__(self, movie, trailerFilter, *args):
@@ -19,9 +20,9 @@ class MovieItemWidget(QFrame):
         locale.setlocale(locale.LC_ALL, "C")
         releaseDate=None
         if movie.releasedate:
-            releaseDate = time.strptime(movie.releasedate, "%a, %d %b %Y %H:%M:%S %z")
+            releaseDate = dparser.parse(movie.releasedate)
             locale.resetlocale()
-            releaseDate = time.strftime("%x", releaseDate)
+            releaseDate = releaseDate.strftime("%x")
         titleLabel = QLabel("<h2>%s</h2> (Release date: %s)" %
         (movie.title, releaseDate), self)
         self.setFrameStyle(QFrame.Panel | QFrame.Sunken);
@@ -44,7 +45,7 @@ class MovieItemWidget(QFrame):
         mainArea.addWidget(genre)
         studio = QLabel("<b>Studio: </b>%s" % movie.studio)
         mainArea.addWidget(studio)
-        directors = QLabel("<b>Director(s): </b>%s" % ", ".join([movie.directors]))
+        directors = QLabel("<b>Director(s): </b>%s" % movie.directors)
         mainArea.addWidget(directors)
         actors = QLabel("<b>Actors: </b>%s" % ", ".join(movie.actors))
         mainArea.addWidget(actors)
