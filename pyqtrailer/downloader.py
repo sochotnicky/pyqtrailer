@@ -4,6 +4,7 @@ import subprocess
 import os
 import signal
 import locale
+import errno
 
 class ClosingException(Exception):
     pass
@@ -100,12 +101,16 @@ def downloadFunc(trailerURL, command, taskDict):
             downloaded = downloaded + 64 * 1024
         perc = downloaded * 100 / totalsize
         if perc % 5 == 0:
-            taskDict[trailerURL] = DownloadStatus(trailerURL,
+            try:
+                taskDict[trailerURL] = DownloadStatus(trailerURL,
                            DownloadStatus.IN_PROGRESS,
                            perc)
+            except IOError as e:
+                print "Ignoring interrupted assignement exception"
+                if e.errno is not errno.EINTR:
+                    raise
 
     p.wait()
-    print p.returncode
     if p.returncode is not 0:
         taskDict[trailerURL] = DownloadStatus(trailerURL,
                            DownloadStatus.ERROR)
