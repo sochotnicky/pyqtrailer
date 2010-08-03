@@ -69,12 +69,12 @@ def trailerDownload(taskQueue, taskDict):
                        targetDir,
                        '--progress=dot:mega']
             downloadFunc(trailerURL, command, taskDict)
-    except ClosingException, e:
+    except ClosingException as e:
         pass
 
 wgetPids=[]
 def downloadFunc(trailerURL, command, taskDict):
-    print "Executing: %s" % " ".join(command)
+    print("Executing: %s" % " ".join(command))
     p = subprocess.Popen(command,
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
@@ -106,7 +106,7 @@ def downloadFunc(trailerURL, command, taskDict):
                            DownloadStatus.IN_PROGRESS,
                            perc)
             except IOError as e:
-                print "Ignoring interrupted assignement exception"
+                print("Ignoring interrupted assignement exception")
                 if e.errno is not errno.EINTR:
                     raise
 
@@ -122,6 +122,6 @@ def downloadFunc(trailerURL, command, taskDict):
 
 def term_handler(signum, frame):
     for p in wgetPids:
-        print 'Stopping wget process ', p
+        print('Stopping wget process ', p)
         os.kill(p, signal.SIGTERM)
     raise ClosingException("Finishing up")

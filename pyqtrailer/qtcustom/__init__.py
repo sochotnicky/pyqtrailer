@@ -5,8 +5,8 @@ import re
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from about_ui import Ui_AboutDialog
-from settings_ui import Ui_SettingsDialog
+from .settings_ui import Ui_SettingsDialog
+from .about_ui import Ui_AboutDialog
 from .. import version
 __version__ = version.__version__
 import dateutil.parser as dparser

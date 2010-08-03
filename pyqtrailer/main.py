@@ -3,17 +3,20 @@ import sys
 import os
 import json
 import multiprocessing
-import ConfigParser as configparser
 import random
 import subprocess
+try:
+    import ConfigParser as configparser
+except ImportError:
+    import configparser as configparser
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 
-from qtcustom import *
+from .qtcustom import *
 import pytrailer as amt
-from downloader import TrailerDownloader, DownloadStatus
+from .downloader import TrailerDownloader, DownloadStatus
 
 categories = [('Just added', '/trailers/home/feeds/just_added.json'),
               ('Exclusive', '/trailers/home/feeds/exclusive.json'),
@@ -198,7 +201,7 @@ class PyTrailerWidget(QMainWindow):
             oldMovie.poster = updatedMovie.poster
             oldMovie.trailerLinks = updatedMovie.trailerLinks
             oldMovie.description = updatedMovie.description
-            if self.movieDict.has_key(oldMovie.title):
+            if oldMovie.title in self.movieDict:
                 w = self.movieDict[oldMovie.title]
                 if w is not None:
                     w.refresh()
@@ -206,7 +209,7 @@ class PyTrailerWidget(QMainWindow):
 
     def refreshDownloadStatus(self):
 
-        for i in self.trailerDownloadDict.keys():
+        for i in list(self.trailerDownloadDict.keys()):
             item = self.trailerDownloadDict[i]
             trailerName = item.url.split('/')[-1]
             statusText = None
@@ -230,7 +233,7 @@ class PyTrailerWidget(QMainWindow):
                 self.statusView.addTopLevelItem(match)
 
 
-        if len(self.trailerDownloadDict.keys()) and not self.statusView.isVisible():
+        if len(list(self.trailerDownloadDict.keys())) and not self.statusView.isVisible():
             self.statusView.setVisible(True)
 
     def downloadTrailer(self, url):

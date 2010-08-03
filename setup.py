@@ -9,7 +9,7 @@ for ui in uis:
     out = ui.replace('.ui','_ui.py')
     command = ["pyuic4","-o",out, ui]
     subprocess.Popen(command)
-    print "run %s" % command
+    print("run %s" % command)
 
 setup(name='pyqtrailer',
       version=pyqtrailer.__version__,
