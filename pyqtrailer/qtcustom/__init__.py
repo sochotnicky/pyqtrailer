@@ -72,6 +72,8 @@ class MovieItemWidget(QFrame):
 
         self.downloadButtons = QButtonGroup()
         self.downloadButtons.buttonClicked.connect(self.download)
+        self.viewButtons = QButtonGroup()
+        self.viewButtons.buttonClicked.connect(self.view)
         links = 0
         for trailerLink in movie.trailerLinks:
             if not self.filter.visible(trailerLink):
@@ -87,6 +89,7 @@ class MovieItemWidget(QFrame):
             hbox.addWidget(lab)
             hbox.addWidget(button)
             button=QPushButton("View")
+            self.viewButtons.addButton(button, links)
             hbox.addWidget(button)
             self.mainArea.addLayout(hbox)
             links = links + 1
@@ -96,10 +99,16 @@ class MovieItemWidget(QFrame):
         self.layout().addWidget(desc)
 
     downloadClicked = pyqtSignal((QString, ))
+    viewClicked = pyqtSignal((QString, ))
 
     def download(self, button):
         id = self.downloadButtons.id(button)
         self.downloadClicked.emit(self.movie.trailerLinks[id])
+
+    def view(self, button):
+        id = self.viewButtons.id(button)
+        self.viewClicked.emit(self.movie.trailerLinks[id])
+
 
 class PyTrailerSettings(QDialog):
     def __init__(self, config):
@@ -124,7 +133,7 @@ class PyTrailerSettings(QDialog):
         self.filters = [('all','.*mov.*'),
                    ('320x180',r'.*h320\.mov.*'),
                    ('480x204',r'.*h480\.mov.*'),
-                   ('640x360',r'.*h640\.mov.*'),
+                   ('640x360',r'.*h640w\.mov.*'),
                    ('480p',r'.*480p\.mov.*'),
                    ('720p',r'.*720p\.mov.*'),
                    ('1080p',r'.*1080p\.mov.*')]

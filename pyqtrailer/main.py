@@ -6,6 +6,7 @@ import pickle
 import multiprocessing
 import ConfigParser as configparser
 import random
+import subprocess
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -175,6 +176,7 @@ class PyTrailerWidget(QMainWindow):
             w=MovieItemWidget(movie, filt, self.scrollArea)
             w.setVisible(False)
             w.downloadClicked.connect(self.downloadTrailer)
+            w.viewClicked.connect(self.viewTrailer)
             self.movieDict[movie.title] = w
             self.mainArea.addWidget(w)
 
@@ -240,6 +242,11 @@ class PyTrailerWidget(QMainWindow):
                                       self.config.get("DEFAULT","downloadDir")))
         self.trailerDownloadDict[str(url)] = DownloadStatus(str(url),
                            DownloadStatus.WAITING)
+    def viewTrailer(self, url):
+        command = ['mplayer','-user-agent',
+                   'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT5.1 Service Pack 3)',
+                   url]
+        subprocess.Popen(command)
 
 
 class TrailerFilter(object):
