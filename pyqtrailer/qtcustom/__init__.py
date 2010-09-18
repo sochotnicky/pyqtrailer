@@ -85,10 +85,10 @@ class MovieItemWidget(QFrame):
                 self._add_buttons(trailerName, trailerLink, links)
                 links = links + 1
 
-            desc = QLabel(movie.description)
-            desc.setWordWrap(True)
-            desc.setTextFormat(Qt.RichText)
-            self.layout().addWidget(desc)
+        desc = QLabel(movie.description)
+        desc.setWordWrap(True)
+        desc.setTextFormat(Qt.RichText)
+        self.layout().addWidget(desc)
 
     def _add_buttons(self, trailerName, trailerLink, ids):
         lab = QLabel('<a href="%s">%s</a>' % (trailerLink, trailerName), self)
