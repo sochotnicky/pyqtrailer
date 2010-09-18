@@ -66,6 +66,7 @@ class MovieItemWidget(QFrame):
 
         movie = self.movie
 
+        self.button_mapping = {}
         posterImage = QImage()
         posterImage.loadFromData(movie.poster)
         self.posterLabel.setPixmap(QPixmap.fromImage(posterImage))
@@ -75,35 +76,40 @@ class MovieItemWidget(QFrame):
         self.viewButtons = QButtonGroup()
         self.viewButtons.buttonClicked.connect(self.view)
         links = 0
-        for trailerLink in movie.trailerLinks:
-            if not self.filter.visible(trailerLink):
+        for trailerName in movie.trailerLinks:
+            trailerURLS = movie.trailerLinks[trailerName]
+            for trailerLink in trailerURLS:
+                if not self.filter.visible(trailerLink):
+                    links = links + 1
+                    continue
+                self._add_buttons(trailerName, trailerLink, links)
                 links = links + 1
-                continue
-            label = '%s' % trailerLink.split('/')[-1]
-            label = label[:label.rindex('.mov')]
-            lab = QLabel('<a href="%s">%s</a>' % (trailerLink, label),self)
-            hbox= QHBoxLayout()
-            button=QPushButton("Download")
-            self.downloadButtons.addButton(button, links)
-            hbox.addStretch(1)
-            hbox.addWidget(lab)
-            hbox.addWidget(button)
-            button=QPushButton("View")
-            self.viewButtons.addButton(button, links)
-            hbox.addWidget(button)
-            self.mainArea.addLayout(hbox)
-            links = links + 1
-        desc = QLabel(movie.description)
-        desc.setWordWrap(True)
-        desc.setTextFormat(Qt.RichText)
-        self.layout().addWidget(desc)
+
+            desc = QLabel(movie.description)
+            desc.setWordWrap(True)
+            desc.setTextFormat(Qt.RichText)
+            self.layout().addWidget(desc)
+
+    def _add_buttons(self, trailerName, trailerLink, ids):
+        lab = QLabel('<a href="%s">%s</a>' % (trailerLink, trailerName), self)
+        hbox= QHBoxLayout()
+        button=QPushButton("Download")
+        self.downloadButtons.addButton(button, ids)
+        self.button_mapping[ids] = trailerLink
+        hbox.addStretch(1)
+        hbox.addWidget(lab)
+        hbox.addWidget(button)
+        button=QPushButton("View")
+        self.viewButtons.addButton(button, ids)
+        hbox.addWidget(button)
+        self.mainArea.addLayout(hbox)
 
     downloadClicked = pyqtSignal((QString, ))
     viewClicked = pyqtSignal((QString, ))
 
     def download(self, button):
         id = self.downloadButtons.id(button)
-        self.downloadClicked.emit(self.movie.trailerLinks[id])
+        self.downloadClicked.emit(self.button_mapping[id])
 
     def view(self, button):
         id = self.viewButtons.id(button)
