@@ -1,5 +1,12 @@
 from distutils.core import setup
 import pyqtrailer
+import subprocess
+
+for ui in ['pyqtrailer/qtcustom/settings.ui','pyqtrailer/qtcustom/about.ui']:
+    out = ui.replace('.ui','_ui.py')
+    command = ["pyuic4","-o",out, ui]
+    subprocess.Popen(command)
+    print "run %s" % command
 
 setup(name='pyqtrailer',
       version=pyqtrailer.__version__,
