@@ -27,9 +27,11 @@ class PyTrailerWidget(QMainWindow):
 
     def __init__(self, *args):
         QMainWindow.__init__(self, *args)
-        READ_AHEAD_PROC = 4
         self.config = configparser.SafeConfigParser({'downloadDir':'/tmp',
-                                       'filters':pickle.dumps([])})
+                                       'filters':pickle.dumps([]),
+                                       'readAhead':'4',
+                                       'parallelDownload':'2'})
+        readAhead = int(self.config.get("DEFAULT","readAhead"))
         self.config.read(self.configPath)
         self.movieDict = {}
         self.readAheadTaskQueue = multiprocessing.Queue()
@@ -38,7 +40,7 @@ class PyTrailerWidget(QMainWindow):
         self.trailerDownloadDict = multiprocessing.Manager().dict()
 
         self.readAheadProcess = []
-        for i in range(READ_AHEAD_PROC):
+        for i in range(readAhead):
             p = multiprocessing.Process(target=movieReadAhead,
                         args=(self.readAheadTaskQueue,
                               self.readAheadDoneQueue))
@@ -47,7 +49,7 @@ class PyTrailerWidget(QMainWindow):
 
         self.downloader = TrailerDownloader(self.trailerDownloadQueue,
                                self.trailerDownloadDict,
-                               2)
+                               int(self.config.get("DEFAULT","parallelDownload")))
         self.downloader.start()
         self.init_widget()
         self.init_menus()

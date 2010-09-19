@@ -140,6 +140,8 @@ class PyTrailerSettings(QDialog):
         self.ui = Ui_SettingsDialog()
         self.ui.setupUi(self)
         self.ui.downloadPath.setText(config.get("DEFAULT","downloadDir"))
+        self.ui.spinReadAhead.setValue(int(config.get("DEFAULT","readAhead")))
+        self.ui.spinParallelDownload.setValue(int(config.get("DEFAULT","parallelDownload")))
 
         self.ui.browseButton.clicked.connect(self.browseDir)
         self.ui.qualityUp.clicked.connect(self.filterUp)
@@ -187,7 +189,9 @@ class PyTrailerSettings(QDialog):
             for fn, fregex in self.filters:
                 if fn == filterName:
                     activeFilters.append(fregex)
-        self.config.set("DEFAULT","filters",pickle.dumps(activeFilters))
+        self.config.set("DEFAULT","filters", pickle.dumps(activeFilters))
+        self.config.set("DEFAULT","readAhead", str(self.ui.spinReadAhead.value()))
+        self.config.set("DEFAULT","parallelDownload", str(self.ui.spinParallelDownload.value()))
         QDialog.accept(self)
 
     def browseDir(self):
