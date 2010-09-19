@@ -129,6 +129,7 @@ class PyTrailerWidget(QMainWindow):
         d = PyTrailerSettings(self.config)
         if d.exec_() == QDialog.Accepted:
             self.saveConfig()
+
     def about(self):
         w = PyTrailerAbout(self)
         w.exec_()

@@ -5,6 +5,7 @@ import locale
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from about_ui import Ui_AboutDialog
+from settings_ui import Ui_SettingsDialog
 from .. import version
 __version__ = version.__version__
 import dateutil.parser as dparser
@@ -120,68 +121,62 @@ class PyTrailerSettings(QDialog):
     def __init__(self, config):
         QDialog.__init__(self)
         self.config = config
-        label = QLabel(self.tr("&Download path"))
-        self.downloadPath = QLineEdit(self)
-        self.downloadPath.setText(config.get("DEFAULT","downloadDir"))
-        label.setBuddy(self.downloadPath)
+        self.ui = Ui_SettingsDialog()
+        self.ui.setupUi(self)
+        self.ui.downloadPath.setText(config.get("DEFAULT","downloadDir"))
 
-        browseBut = QPushButton(self.tr("&Browse"))
-        browseBut.clicked.connect(self.browseDir)
+        self.ui.browseButton.clicked.connect(self.browseDir)
+        self.ui.qualityUp.clicked.connect(self.filterUp)
+        self.ui.qualityDown.clicked.connect(self.filterDown)
 
-        hbox = QHBoxLayout()
-        hbox.addWidget(label)
-        hbox.addWidget(self.downloadPath)
-        hbox.addWidget(browseBut)
-
-        vbox = QVBoxLayout()
-        vbox.addLayout(hbox)
-        hbox = QHBoxLayout()
-        self.filters = [('all','.*mov.*'),
-                   ('320x180',r'.*h320\.mov.*'),
+        self.filters = [('320x180',r'.*h320\.mov.*'),
                    ('480x204',r'.*h480\.mov.*'),
                    ('640x360',r'.*h640w\.mov.*'),
                    ('480p',r'.*480p\.mov.*'),
                    ('720p',r'.*720p\.mov.*'),
                    ('1080p',r'.*1080p\.mov.*')]
         activeFilters = pickle.loads(config.get("DEFAULT","filters"))
-        filterLayout = QVBoxLayout()
-        filterGroup = QGroupBox(self.tr("Trailer quality filter"))
-        filterGroup.setLayout(filterLayout)
-        vbox.addWidget(filterGroup)
-        self.filterButtons = []
-        for qual, filt in self.filters:
-            active = False
-            if filt in activeFilters:
-                active = True
-            option = QCheckBox(qual)
-            option.setChecked(active)
-            self.filterButtons.append(option)
-            filterLayout.addWidget(option)
+        self.ui.filterList.clear()
+        added = []
+        for filt in activeFilters:
+            for fn, fregex in self.filters:
+                if fregex  == filt:
+                    self.ui.filterList.addItem(fn)
+                    added.append(fn)
 
-        self.filterButtons[0].clicked.connect(self.refreshFilters)
-        buttonBox = QDialogButtonBox(QDialogButtonBox.Ok
-                                      | QDialogButtonBox.Cancel);
+        for filt in self.filters:
+            if filt[0] not in added:
+                self.ui.filterList.addItem(filt[0])
+                added.append(filt[0])
 
-        self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"));
-        self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"));
-        vbox.addWidget(buttonBox)
-        self.setLayout(vbox)
-        self.refreshFilters()
+    def filterUp(self):
+        currentRow = self.ui.filterList.currentRow()
+        if currentRow == 0:
+            return
 
-    def refreshFilters(self):
-        for button in self.filterButtons[1:]:
-            button.setEnabled(not self.filterButtons[0].isChecked())
+        item = self.ui.filterList.takeItem(currentRow)
+        self.ui.filterList.insertItem(currentRow-1, item)
+        self.ui.filterList.setCurrentRow(currentRow-1)
 
+    def filterDown(self):
+        currentRow = self.ui.filterList.currentRow()
+        if currentRow == self.ui.filterList.count()-1:
+            return
+
+        item = self.ui.filterList.takeItem(currentRow)
+        self.ui.filterList.insertItem(currentRow+1, item)
+        self.ui.filterList.setCurrentRow(currentRow+1)
 
     def accept(self):
         self.config.set("DEFAULT","downloadDir",
-                        str(self.downloadPath.text()))
+                        str(self.ui.downloadPath.text()))
         activeFilters = []
-        ind = 0
-        for button in self.filterButtons:
-            if button.isChecked():
-                activeFilters.append(self.filters[ind][1])
-            ind = ind + 1
+        for i in range(self.ui.filterList.count()):
+            itemWidget = self.ui.filterList.takeItem(0)
+            filterName = str(itemWidget.text())
+            for fn, fregex in self.filters:
+                if fn == filterName:
+                    activeFilters.append(fregex)
         self.config.set("DEFAULT","filters",pickle.dumps(activeFilters))
         QDialog.accept(self)
 
@@ -191,7 +186,7 @@ class PyTrailerSettings(QDialog):
                                                      self.config.get("DEFAULT",
                                                                      "downloadDir"))
         if directory:
-            self.downloadPath.setText(directory)
+            self.ui.downloadPath.setText(directory)
 
 
 class PyTrailerAbout(QDialog):
