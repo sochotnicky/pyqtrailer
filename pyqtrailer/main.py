@@ -1,7 +1,6 @@
 
 import sys
 import os
-import re
 import pickle
 import multiprocessing
 import ConfigParser as configparser
@@ -166,15 +165,10 @@ class PyTrailerWidget(QMainWindow):
         self.movieList = amt.getMoviesFromJSON(url)
         for i in range(len(self.movieList)):
             self.readAheadTaskQueue.put((i, self.movieList[i], self.loadID))
-        filt = TrailerFilter()
         filters = pickle.loads(self.config.get("DEFAULT",'filters'))
-        for trailerFilter in filters:
-            filt.addCondition(trailerFilter)
-        if len(filters) == 0:
-            filt.addCondition(".*")
 
         for movie in self.movieList:
-            w=MovieItemWidget(movie, filt, self.scrollArea)
+            w=MovieItemWidget(movie, filters, self.scrollArea)
             w.setVisible(False)
             w.downloadClicked.connect(self.downloadTrailer)
             w.viewClicked.connect(self.viewTrailer)
@@ -249,26 +243,6 @@ class PyTrailerWidget(QMainWindow):
                    url]
         subprocess.Popen(command)
 
-
-class TrailerFilter(object):
-    """Class to create filter so that we can show only
-    some of the trailers (only HD/only 480p etc)
-    """
-    def __init__(self):
-        self.conditions=[]
-
-    def addCondition(self, regex):
-        """Adds another condition that makes movie visible
-        """
-        self.conditions.append(re.compile(regex))
-
-    def visible(self, trailerURL):
-        """Class returns true if the trailer should be visible
-        """
-        for cond in self.conditions:
-            if re.match(cond, trailerURL):
-                return True
-        return False
 
 def movieReadAhead(taskQueue, doneQueue):
     """Function to be run in separate process,

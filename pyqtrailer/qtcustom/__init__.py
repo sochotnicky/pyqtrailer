@@ -1,6 +1,7 @@
 import pickle
 import time
 import locale
+import re
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -11,11 +12,11 @@ __version__ = version.__version__
 import dateutil.parser as dparser
 
 class MovieItemWidget(QFrame):
-    def __init__(self, movie, trailerFilter, *args):
+    def __init__(self, movie, trailerFilters, *args):
         QWidget.__init__(self, *args)
 
         self.movie = movie
-        self.filter = trailerFilter
+        self.filters = trailerFilters
 
         self.titlebox = QHBoxLayout()
         locale.setlocale(locale.LC_ALL, "C")
@@ -79,12 +80,18 @@ class MovieItemWidget(QFrame):
         links = 0
         for trailerName in movie.trailerLinks:
             trailerURLS = movie.trailerLinks[trailerName]
-            for trailerLink in trailerURLS:
-                if not self.filter.visible(trailerLink):
-                    links = links + 1
-                    continue
-                self._add_buttons(trailerName, trailerLink, links)
-                links = links + 1
+            match = 0
+            for tf in self.filters:
+                cond = re.compile(tf)
+                for url in trailerURLS:
+                    if re.match(cond, url):
+                        self._add_buttons(trailerName, url, links)
+                        links = links + 1
+                        match = 1
+                        break
+                if match == 1:
+                    break
+
 
         desc = QLabel(movie.description)
         desc.setWordWrap(True)
@@ -92,6 +99,8 @@ class MovieItemWidget(QFrame):
         self.layout().addWidget(desc)
 
     def _add_buttons(self, trailerName, trailerLink, ids):
+        trailerName = "%s (%s)" % (trailerName,
+                                   PyTrailerSettings.getQualityFromURL(trailerLink))
         lab = QLabel('<a href="%s">%s</a>' % (trailerLink, trailerName), self)
         hbox= QHBoxLayout()
         button=QPushButton("Download")
@@ -118,6 +127,13 @@ class MovieItemWidget(QFrame):
 
 
 class PyTrailerSettings(QDialog):
+    filters = [('320x180',r'.*h320\.mov$'),
+               ('480x204',r'.*h480\.mov$'),
+               ('640x360',r'.*h640w\.mov$'),
+               ('480p',r'.*480p\.mov$'),
+               ('720p',r'.*720p\.mov$'),
+               ('1080p',r'.*1080p\.mov$')]
+
     def __init__(self, config):
         QDialog.__init__(self)
         self.config = config
@@ -129,12 +145,6 @@ class PyTrailerSettings(QDialog):
         self.ui.qualityUp.clicked.connect(self.filterUp)
         self.ui.qualityDown.clicked.connect(self.filterDown)
 
-        self.filters = [('320x180',r'.*h320\.mov.*'),
-                   ('480x204',r'.*h480\.mov.*'),
-                   ('640x360',r'.*h640w\.mov.*'),
-                   ('480p',r'.*480p\.mov.*'),
-                   ('720p',r'.*720p\.mov.*'),
-                   ('1080p',r'.*1080p\.mov.*')]
         activeFilters = pickle.loads(config.get("DEFAULT","filters"))
         self.ui.filterList.clear()
         added = []
@@ -188,6 +198,12 @@ class PyTrailerSettings(QDialog):
         if directory:
             self.ui.downloadPath.setText(directory)
 
+    @staticmethod
+    def getQualityFromURL(url):
+        for fn, fregex in PyTrailerSettings.filters:
+            if re.match(fregex, url):
+                return fn
+        return "Unknown quality"
 
 class PyTrailerAbout(QDialog):
     def __init__(self, parent):
