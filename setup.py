@@ -1,8 +1,11 @@
 from distutils.core import setup
 import pyqtrailer
 import subprocess
+import sys
 
-for ui in ['pyqtrailer/qtcustom/settings.ui','pyqtrailer/qtcustom/about.ui']:
+uis = ["%s/pyqtrailer/qtcustom/settings.ui" % sys.path[0],"%s/pyqtrailer/qtcustom/about.ui" % sys.path[0]]
+
+for ui in uis:
     out = ui.replace('.ui','_ui.py')
     command = ["pyuic4","-o",out, ui]
     subprocess.Popen(command)
@@ -26,5 +29,6 @@ setup(name='pyqtrailer',
       platforms=["any"],
       packages=["pyqtrailer",
                 "pyqtrailer.qtcustom"],
+      package_data={"pyqtrailer.qtcustom":["*.ui"]},
       scripts=["scripts/pyqtrailer"],
      )

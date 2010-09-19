@@ -1,0 +1,2 @@
+global-exclude *_ui.py
+global-include *.ui
