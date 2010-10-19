@@ -1,0 +1,11 @@
+
+[Desktop Entry]
+Name=PyQtrailer
+GenericName=Trailer Downloader
+Comment=Application to download movie trailers from apple.com
+Exec=pyqtrailer
+Icon=pyqtrailer
+Terminal=false
+Type=Application
+Categories=Video;AudioVideo;
+
