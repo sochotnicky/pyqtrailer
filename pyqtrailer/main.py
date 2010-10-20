@@ -198,7 +198,6 @@ class PyTrailerWidget(QMainWindow):
             oldMovie.poster = updatedMovie.poster
             oldMovie.trailerLinks = updatedMovie.trailerLinks
             oldMovie.description = updatedMovie.description
-            oldMovie.cached = True
             if self.movieDict.has_key(oldMovie.title):
                 w = self.movieDict[oldMovie.title]
                 if w is not None:

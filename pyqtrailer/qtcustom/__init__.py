@@ -21,10 +21,12 @@ class MovieItemWidget(QFrame):
         self.titlebox = QHBoxLayout()
         locale.setlocale(locale.LC_ALL, "C")
         releaseDate=None
-        if movie.releasedate:
+        if hasattr(movie, "releasedate"):
             releaseDate = dparser.parse(movie.releasedate)
             locale.resetlocale()
             releaseDate = releaseDate.strftime("%x")
+        else:
+            releaseDate = "Unknown release date"
         titleLabel = QLabel("<h2>%s</h2> (Release date: %s)" %
         (movie.title, releaseDate), self)
         self.setFrameStyle(QFrame.Panel | QFrame.Sunken);
@@ -39,17 +41,20 @@ class MovieItemWidget(QFrame):
 
         mainArea = QVBoxLayout()
         self.mainArea = mainArea
-        if movie.genre:
-            genStr = ", ".join(movie.genre)
-        else:
-            genStr = "Unknown"
-        genre = QLabel("<b>Genre(s): </b>%s" % genStr)
+        genre = QLabel("<b>Genre(s): </b>%s" %
+                       self.__get_movie_info(movie, "genre", True))
         mainArea.addWidget(genre)
-        studio = QLabel("<b>Studio: </b>%s" % movie.studio)
+
+        studio = QLabel("<b>Studio: </b>%s" %
+                        self.__get_movie_info(movie, "studio"))
         mainArea.addWidget(studio)
-        directors = QLabel("<b>Director(s): </b>%s" % movie.directors)
+
+        directors = QLabel("<b>Director(s): </b>%s" %
+                           self.__get_movie_info(movie, "directors"))
         mainArea.addWidget(directors)
-        actors = QLabel("<b>Actors: </b>%s" % ", ".join(movie.actors))
+
+        actors = QLabel("<b>Actors: </b>%s" %
+                        self.__get_movie_info(movie, "actors", True))
         mainArea.addWidget(actors)
         actors.setWordWrap(True)
         mainArea.addStretch(1)
@@ -63,6 +68,15 @@ class MovieItemWidget(QFrame):
         topLevelLayout.addLayout(middleArea)
         self.setMinimumSize(400,150)
         self.setLayout(topLevelLayout)
+
+    def __get_movie_info(self, movie, info, join=False):
+        ret = "Unknown"
+        if hasattr(movie, info):
+            if join:
+                ret = ", ".join(getattr(movie, info))
+            else:
+                ret = getattr(movie, info)
+        return ret
 
     def refresh(self):
 
