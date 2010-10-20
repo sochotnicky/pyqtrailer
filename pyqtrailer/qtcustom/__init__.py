@@ -5,6 +5,13 @@ import re
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
+try:
+    from PyQt4.QtCore import QString
+except ImportError:
+    # we are using Python3 so QString is not defined
+    QString = type("")
+
 from .settings_ui import Ui_SettingsDialog
 from .about_ui import Ui_AboutDialog
 from .. import version
