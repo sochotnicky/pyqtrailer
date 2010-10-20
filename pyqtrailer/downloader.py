@@ -83,7 +83,7 @@ def downloadFunc(trailerURL, command, taskDict):
     wgetPids.append(p.pid)
     totalsize = 0
     while True:
-        line = p.stderr.readline()
+        line = p.stderr.readline().decode()
         if len(line) == 0:
             break
         if line.find('Length:') != -1:
@@ -93,7 +93,7 @@ def downloadFunc(trailerURL, command, taskDict):
     # now we start counting dots :-)
     downloaded = 0
     while True:
-        x = p.stderr.read(1)
+        x = p.stderr.read(1).decode()
 
         if len(x) == 0:
             break
