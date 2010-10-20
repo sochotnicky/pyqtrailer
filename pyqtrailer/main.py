@@ -1,7 +1,7 @@
 
 import sys
 import os
-import pickle
+import json
 import multiprocessing
 import ConfigParser as configparser
 import random
@@ -28,7 +28,7 @@ class PyTrailerWidget(QMainWindow):
     def __init__(self, *args):
         QMainWindow.__init__(self, *args)
         self.config = configparser.SafeConfigParser({'downloadDir':'/tmp',
-                                       'filters':pickle.dumps([]),
+                                       'filters':json.dumps([y for x, y in PyTrailerSettings.filters]),
                                        'readAhead':'4',
                                        'parallelDownload':'2'})
         readAhead = int(self.config.get("DEFAULT","readAhead"))
@@ -167,7 +167,7 @@ class PyTrailerWidget(QMainWindow):
         self.movieList = amt.getMoviesFromJSON(url)
         for i in range(len(self.movieList)):
             self.readAheadTaskQueue.put((i, self.movieList[i], self.loadID))
-        filters = pickle.loads(self.config.get("DEFAULT",'filters'))
+        filters = json.loads(self.config.get("DEFAULT","filters"))
 
         for movie in self.movieList:
             w=MovieItemWidget(movie, filters, self.scrollArea)
@@ -178,7 +178,7 @@ class PyTrailerWidget(QMainWindow):
             self.mainArea.addWidget(w)
 
     def saveConfig(self):
-        with open(self.configPath, 'wb') as configfile:
+        with open(self.configPath, 'w') as configfile:
             self.config.write(configfile)
 
     def closeEvent(self, closeEvent):

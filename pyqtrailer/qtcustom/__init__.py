@@ -1,4 +1,4 @@
-import pickle
+import json
 import time
 import locale
 import re
@@ -161,7 +161,7 @@ class PyTrailerSettings(QDialog):
         self.ui.qualityUp.clicked.connect(self.filterUp)
         self.ui.qualityDown.clicked.connect(self.filterDown)
 
-        activeFilters = pickle.loads(config.get("DEFAULT","filters"))
+        activeFilters = json.loads(config.get("DEFAULT","filters"))
         self.ui.filterList.clear()
         added = []
         for filt in activeFilters:
@@ -203,7 +203,7 @@ class PyTrailerSettings(QDialog):
             for fn, fregex in self.filters:
                 if fn == filterName:
                     activeFilters.append(fregex)
-        self.config.set("DEFAULT","filters", pickle.dumps(activeFilters))
+        self.config.set("DEFAULT","filters", json.dumps(activeFilters))
         self.config.set("DEFAULT","readAhead", str(self.ui.spinReadAhead.value()))
         self.config.set("DEFAULT","parallelDownload", str(self.ui.spinParallelDownload.value()))
         QDialog.accept(self)
