@@ -21,8 +21,7 @@ from .downloader import TrailerDownloader, DownloadStatus
 categories = [('Just added', '/trailers/home/feeds/just_added.json'),
               ('Exclusive', '/trailers/home/feeds/exclusive.json'),
               ('Only HD', '/trailers/home/feeds/just_hd.json'),
-              ('Most popular', '/trailers/home/feeds/most_pop.json'),
-              ('Search', '/trailers/home/scripts/quickfind.php?callback=searchCallback&q=')]
+              ('Most popular', '/trailers/home/feeds/most_pop.json')]
 
 
 class PyTrailerWidget(QMainWindow):
