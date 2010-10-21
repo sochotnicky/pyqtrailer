@@ -143,7 +143,7 @@ class MovieItemWidget(QFrame):
 
     def view(self, button):
         id = self.viewButtons.id(button)
-        self.viewClicked.emit(self.movie.trailerLinks[id])
+        self.viewClicked.emit(self.button_mapping[id])
 
 
 class PyTrailerSettings(QDialog):
