@@ -1,5 +1,4 @@
 import json
-import time
 import locale
 import re
 
@@ -26,9 +25,9 @@ class MovieItemWidget(QFrame):
         self.filters = trailerFilters
 
         self.titlebox = QHBoxLayout()
-        locale.setlocale(locale.LC_ALL, "C")
         releaseDate=None
         if hasattr(movie, "releasedate"):
+            locale.setlocale(locale.LC_ALL, "C")
             releaseDate = dparser.parse(movie.releasedate)
             locale.resetlocale()
             releaseDate = releaseDate.strftime("%x")
