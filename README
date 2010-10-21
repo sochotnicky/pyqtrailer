@@ -1,20 +1,32 @@
-This application is able to download trailers from apple.com/trailers to
-your computer.
+This is nice little application to help you download and view trailers
+from apple.com in a Linux-friendly way :-)
 
-It shows descriptions, posters, and other movie information.
+It shows descriptions, posters, and other movie information. See
+"screenshots" subdirectory for a few shots of application
+
+== Author ==
+Stanislav Ochotnicky (sochotnicky@gmail.com)
+
+== License ==
+
+This application is released under GNU GPLv3. See LICENSE file for details
 
 == Requirements ==
 
-    * Python 2.6 (maybe other versions too, but not tested)
+    * Python 2.6+ (including Python 3.x)
     * pytrailer
     * python-dateutil
-    * PyQt4 
+    * PyQt4
 
 == Installation ==
 
-Releases are made using pypi.python.org. Easiest way to install is:
+Releases are made using pypi.python.org. If your distribution doesn't
+provide packages for you easiest way to install pyqtrailer on most
+Linux distributions is:
 
  $ easy_install pyqtrailer
 
 You have to have PyQt4 already installed though (depends on your
 distribution)
+
+Now you should have "pyqtrailer" executable script in your $PATH. Enjoy
