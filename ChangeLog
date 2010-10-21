@@ -1,0 +1,86 @@
+2010-10-21  Version 0.4.0  Stanislav Ochotnicky <sochotnicky@gmail.com>
+
+	Requires >=pytrailer-0.4
+
+	Bugs fixed:
+	* View button not working
+	* Non-working Search group hidden (for now)
+
+	Features added:
+	* Enable custom player for viewing
+	* Python 3.x support
+	* Add icon and .desktop file
+
+
+2010-10-15  Version 0.3.6  Stanislav Ochotnicky <sochotnicky@gmail.com>
+
+	Bugs fixed:
+	* Added README and LICENSE to sdist for distributions
+
+
+2010-09-20  Version 0.3.5, 0.3.4  Stanislav Ochotnicky <sochotnicky@gmail.com>
+
+	Bugs fixed:
+	* Fix easy_install problem
+	* Fix source dist generation
+
+
+2010-09-19  Version 0.3.3  Stanislav Ochotnicky <sochotnicky@gmail.com>
+
+	Features added:
+	* Add settings to change performance
+	* Show trailer quality with trailer name
+
+	Other:
+	* Automatic generation of python files from *.ui during install
+
+
+2010-09-18  Version 0.3.2,0.3.1  Stanislav Ochotnicky <sochotnicky@gmail.com>
+
+	Bugs fixed:
+	* Fix repeating description with multiple trailers present
+
+	Features added:
+	* Show nice trailer names not just filename
+
+
+2010-09-14  Version 0.3.0  Stanislav Ochotnicky <sochotnicky@gmail.com>
+
+	Features added:
+	* Enable "View" button with mplayer
+
+
+2010-08-03  Version 0.2.5  Stanislav Ochotnicky <sochotnicky@gmail.com>
+
+	Bugs fixed:
+	* Fix EINTR race condition causing stale downloads
+
+2010-07-07  Version 0.2.4,0.2.3  Stanislav Ochotnicky <sochotnicky@gmail.com>
+
+	Bugs fixed:
+	* Fix stale status after a few files downloaded
+	* Fix wrong date parsing
+
+	Features added:
+	* Added "WAITING" state
+
+2010-05-17  Version 0.2.2  Stanislav Ochotnicky <sochotnicky@gmail.com>
+
+	Features added:
+	* Added about dialog
+	* Small improvements in more areas
+
+2010-05-15  Version 0.2.1,0.2  Stanislav Ochotnicky <sochotnicky@gmail.com>
+
+	Bugs fixed:
+	* Fix problem with changing movie groups and their mixing
+	* Fix flickering of movie items
+
+	Features added:
+	* Added LICENSE file
+	* Show download status in status window
+
+
+2010-05-10  Version 0.1  Stanislav Ochotnicky <sochotnicky@gmail.com>
+
+	First release
