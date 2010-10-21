@@ -32,7 +32,8 @@ class PyTrailerWidget(QMainWindow):
         self.config = configparser.SafeConfigParser({'downloadDir':'/tmp',
                                        'filters':json.dumps([y for x, y in PyTrailerSettings.filters]),
                                        'readAhead':'4',
-                                       'parallelDownload':'2'})
+                                       'parallelDownload':'2',
+                                       'player':'mplayer -user-agent %%a %%u'})
         readAhead = int(self.config.get("DEFAULT","readAhead"))
         self.config.read(self.configPath)
         self.movieDict = {}
@@ -246,10 +247,14 @@ class PyTrailerWidget(QMainWindow):
         self.trailerDownloadDict[str(url)] = DownloadStatus(str(url),
                            DownloadStatus.WAITING)
     def viewTrailer(self, url):
-        command = ['mplayer','-user-agent',
-                   'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT5.1 Service Pack 3)',
-                   url]
-        subprocess.Popen(command)
+        player = self.config.get("DEFAULT","player").split(' ')
+        for i in range(len(player)):
+            if player[i] == '%a':
+                player[i] = 'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT5.1 Service Pack 3)'
+            elif player[i] == '%u':
+                player[i] = url
+
+        subprocess.Popen(player)
 
 
 def movieReadAhead(taskQueue, doneQueue):

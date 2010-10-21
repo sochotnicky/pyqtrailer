@@ -167,6 +167,8 @@ class PyTrailerSettings(QDialog):
         self.ui.qualityUp.clicked.connect(self.filterUp)
         self.ui.qualityDown.clicked.connect(self.filterDown)
 
+        self.ui.playerCommand.setText(config.get("DEFAULT","player"))
+
         activeFilters = json.loads(config.get("DEFAULT","filters"))
         self.ui.filterList.clear()
         added = []
@@ -202,6 +204,8 @@ class PyTrailerSettings(QDialog):
     def accept(self):
         self.config.set("DEFAULT","downloadDir",
                         str(self.ui.downloadPath.text()))
+        playerStr = self.ui.playerCommand.text().replace('%','%%')
+        self.config.set("DEFAULT","player", playerStr)
         activeFilters = []
         for i in range(self.ui.filterList.count()):
             itemWidget = self.ui.filterList.takeItem(0)
