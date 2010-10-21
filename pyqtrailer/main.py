@@ -170,7 +170,12 @@ class PyTrailerWidget(QMainWindow):
         self.movieList = amt.getMoviesFromJSON(url)
         for i in range(len(self.movieList)):
             self.readAheadTaskQueue.put((i, self.movieList[i], self.loadID))
-        filters = json.loads(self.config.get("DEFAULT","filters"))
+        try:
+            filters = json.loads(self.config.get("DEFAULT","filters"))
+        except ValueError:
+            # we have old config load old style pickle
+            import pickle
+            filters = pickle.loads(self.config.get("DEFAULT","filters"))
 
         for movie in self.movieList:
             w=MovieItemWidget(movie, filters, self.scrollArea)
