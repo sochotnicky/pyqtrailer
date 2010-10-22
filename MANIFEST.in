@@ -1,3 +1,6 @@
 global-include *.ui
 include LICENSE
 include README
+include xdg/*
+include screenshots/*
+include MANIFEST.in

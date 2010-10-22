@@ -1,3 +1,8 @@
+2010-10-22  Version 0.4.1  Stanislav Ochotnicky  <sochotnicky@gmail.com>
+
+	Bugs fixed:
+	* Added xdg items and screenshots to sdist
+
 2010-10-21  Version 0.4.0  Stanislav Ochotnicky <sochotnicky@gmail.com>
 
 	Requires >=pytrailer-0.4
