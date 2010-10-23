@@ -99,7 +99,7 @@ def downloadFunc(trailerURL, command, taskDict):
             break
         if x == '.' or x ==',':
             downloaded = downloaded + 64 * 1024
-        perc = int(downloaded * 100 / totalsize)
+        perc = downloaded * 100 // totalsize
         if perc % 5 == 0:
             try:
                 taskDict[trailerURL] = DownloadStatus(trailerURL,
