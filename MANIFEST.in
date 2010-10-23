@@ -4,3 +4,4 @@ include README
 include xdg/*
 include screenshots/*
 include MANIFEST.in
+include ChangeLog
