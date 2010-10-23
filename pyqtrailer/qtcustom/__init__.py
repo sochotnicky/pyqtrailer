@@ -9,7 +9,7 @@ try:
     from PyQt4.QtCore import QString
 except ImportError:
     # we are using Python3 so QString is not defined
-    QString = type("")
+    QString = str
 
 from .settings_ui import Ui_SettingsDialog
 from .about_ui import Ui_AboutDialog
