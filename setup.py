@@ -1,15 +1,20 @@
+from distutils.command.build_py import build_py as _build_py
 from distutils.core import setup
 import pyqtrailer
 import subprocess
 import sys
 
-uis = ["%s/pyqtrailer/qtcustom/settings.ui" % sys.path[0],"%s/pyqtrailer/qtcustom/about.ui" % sys.path[0]]
+class build_py(_build_py):
+    uis = ["%s/pyqtrailer/qtcustom/settings.ui" % sys.path[0],"%s/pyqtrailer/qtcustom/about.ui" % sys.path[0]]
 
-for ui in uis:
-    out = ui.replace('.ui','_ui.py')
-    command = ["pyuic4","-o",out, ui]
-    subprocess.Popen(command)
-    print("run %s" % command)
+    def run(self):
+        for ui in self.uis:
+            out = ui.replace('.ui','_ui.py')
+            command = ["pyuic4","-o",out, ui]
+            subprocess.Popen(command)
+            self.byte_compile(out)
+        _build_py.run(self)
+
 
 setup(name='pyqtrailer',
       version=pyqtrailer.__version__,
@@ -31,4 +36,6 @@ setup(name='pyqtrailer',
                 "pyqtrailer.qtcustom"],
       package_data={"pyqtrailer.qtcustom":["*.ui"]},
       scripts=["scripts/pyqtrailer"],
+      cmdclass={'build_py': build_py},
      )
+
