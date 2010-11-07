@@ -5,7 +5,9 @@ import subprocess
 import sys
 
 class build_py(_build_py):
-    uis = ["%s/pyqtrailer/qtcustom/settings.ui" % sys.path[0],"%s/pyqtrailer/qtcustom/about.ui" % sys.path[0]]
+    uis = ["%s/pyqtrailer/qtcustom/settings.ui" % sys.path[0],
+           "%s/pyqtrailer/qtcustom/about.ui" % sys.path[0],
+           "%s/pyqtrailer/qtcustom/search.ui" % sys.path[0]]
 
     def run(self):
         for ui in self.uis:
@@ -25,7 +27,7 @@ setup(name='pyqtrailer',
       requires=["pytrailer"],
       install_requires=['pytrailer>=0.4',"python-dateutil >= 1.5"],
       classifiers=['Development Status :: 4 - Beta',
-                   'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
+                   'License :: OSI Approved :: GNU General Public License (GPL)'
                    'Programming Language :: Python :: 2.6',
                    'Topic :: Software Development :: User Interfaces',
                    'Topic :: Multimedia :: Video'],
