@@ -14,15 +14,15 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 
-from .qtcustom import *
 import pytrailer as amt
+from .qtcustom import *
 from .downloader import TrailerDownloader, DownloadStatus
 
 categories = [('Just added', '/trailers/home/feeds/just_added.json'),
               ('Exclusive', '/trailers/home/feeds/exclusive.json'),
               ('Only HD', '/trailers/home/feeds/just_hd.json'),
               ('Most popular', '/trailers/home/feeds/most_pop.json'),
-              ('Search', '/trailers/home/scripts/quickfind.php?callback=searchCallback&q=')]
+              ('Search', '/trailers/home/scripts/quickfind.php?&q=')]
 
 
 class PyTrailerWidget(QMainWindow):
@@ -164,6 +164,14 @@ class PyTrailerWidget(QMainWindow):
             if cat == groupName:
                 url = "http://trailers.apple.com%s" % catURL
                 break
+
+        if groupName == "Search":
+            d = PyTrailerSearch(self)
+            if d.exec_() == QDialog.Accepted:
+                url = "%s%s" % (url, d.ui.lineEdit.text())
+            else:
+                return
+        print(url)
 
         self.unloadCurrentGroup()
         self.loadID = random.random()

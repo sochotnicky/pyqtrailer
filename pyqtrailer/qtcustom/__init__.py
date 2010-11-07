@@ -13,6 +13,7 @@ except ImportError:
 
 from .settings_ui import Ui_SettingsDialog
 from .about_ui import Ui_AboutDialog
+from .search_ui import Ui_Search
 from .. import version
 __version__ = version.__version__
 import dateutil.parser as dparser
@@ -242,3 +243,9 @@ class PyTrailerAbout(QDialog):
         self.ui.label_version.setText(__version__)
         self.connect(self.ui.buttonClose, SIGNAL("clicked(bool)"), self.close)
 
+class PyTrailerSearch(QDialog):
+    def __init__(self, parent):
+        QDialog.__init__(self)
+        self.ui = Ui_Search()
+        self.ui.setupUi(self)
+        self._main  = parent

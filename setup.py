@@ -25,7 +25,7 @@ setup(name='pyqtrailer',
       author_email='sochotnicky@gmail.com',
       url='http://github.com/sochotnicky/pyqtrailer',
       requires=["pytrailer"],
-      install_requires=['pytrailer>=0.4',"python-dateutil >= 1.5"],
+      install_requires=['pytrailer>=0.5',"python-dateutil >= 1.5"],
       classifiers=['Development Status :: 4 - Beta',
                    'License :: OSI Approved :: GNU General Public License (GPL)'
                    'Programming Language :: Python :: 2.6',
