@@ -93,7 +93,11 @@ def downloadFunc(trailerURL, command, taskDict):
     # now we start counting dots :-)
     downloaded = 0
     while True:
-        x = p.stderr.read(1).decode()
+        try:
+            x = p.stderr.read(1).decode()
+        except UnicodeDecodeError as e:
+            # if we get here something's weird with wget's output. Let's skip
+            continue
 
         if len(x) == 0:
             break
