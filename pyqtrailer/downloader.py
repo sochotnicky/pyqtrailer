@@ -5,6 +5,7 @@ import os
 import signal
 import locale
 import errno
+import codecs
 
 class ClosingException(Exception):
     pass
@@ -92,12 +93,10 @@ def downloadFunc(trailerURL, command, taskDict):
 
     # now we start counting dots :-)
     downloaded = 0
+    Reader = codecs.getreader("utf-8")
+    stdReader = Reader(p.stderr)
     while True:
-        try:
-            x = p.stderr.read(1).decode()
-        except UnicodeDecodeError as e:
-            # if we get here something's weird with wget's output. Let's skip
-            continue
+        x = stdReader.read(1)
 
         if len(x) == 0:
             break
