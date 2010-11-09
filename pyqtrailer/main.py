@@ -217,6 +217,8 @@ class PyTrailerWidget(QMainWindow):
                 if w is not None:
                     w.refresh()
                     w.setVisible(True)
+                else:
+                    break
 
     def refreshDownloadStatus(self):
 
