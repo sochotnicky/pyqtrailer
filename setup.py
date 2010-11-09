@@ -36,8 +36,12 @@ class build_py(_build_py):
             subprocess.Popen(command)
             self.byte_compile(out)
         res = "pyqtrailer/qtcustom/resources.py"
-        command = ["pyrcc4", "-py3", "resources.qrc",
+
+        command = ["pyrcc4", "resources.qrc",
                    "-o", res]
+        if sys.version_info[0] == 3:
+            command.append('-py3')
+
         subprocess.Popen(command)
         regen_messages()
         _build_py.run(self)
