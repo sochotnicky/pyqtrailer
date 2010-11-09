@@ -3,6 +3,26 @@ from distutils.core import setup
 import pyqtrailer
 import subprocess
 import sys
+import os
+
+def get_messages():
+    msgfiles = []
+    for filename in os.listdir('po/'):
+        if filename.endswith('.qm'):
+            msgfiles.append('po/%s' % filename)
+    return msgfiles
+
+def regen_messages():
+    po_files = []
+    for filename in os.listdir('po/'):
+        if filename.endswith('.po'):
+            po_files.append('-i')
+            po_files.append(filename)
+            po_files.append('-o')
+            outFile = filename.replace(".po",'.qm')
+            command = ["lconvert", '-i', "po/%s" % filename, '-o', "po/%s" % outFile]
+            subprocess.Popen(command)
+
 
 class build_py(_build_py):
     uis = ["%s/pyqtrailer/qtcustom/settings.ui" % sys.path[0],
@@ -15,8 +35,8 @@ class build_py(_build_py):
             command = ["pyuic4","-o",out, ui]
             subprocess.Popen(command)
             self.byte_compile(out)
+        regen_messages()
         _build_py.run(self)
-
 
 setup(name='pyqtrailer',
       version=pyqtrailer.__version__,
@@ -37,6 +57,7 @@ setup(name='pyqtrailer',
       packages=["pyqtrailer",
                 "pyqtrailer.qtcustom"],
       package_data={"pyqtrailer.qtcustom":["*.ui"]},
+      data_files = [('/usr/share/pyqtrailer/lang', get_messages())],
       scripts=["scripts/pyqtrailer"],
       cmdclass={'build_py': build_py},
      )
