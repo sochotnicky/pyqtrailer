@@ -84,7 +84,7 @@ class PyTrailerWidget(QMainWindow):
 
         statusView = QTreeWidget(centralWidget)
         statusView.setMaximumHeight(200)
-        statusView.setHeaderLabels(["Trailer","Download status"])
+        statusView.setHeaderLabels([self.tr("Trailer"),self.tr("Download status")])
         statusView.setVisible(False)
         statusView.setRootIsDecorated(False)
         statusView.setColumnWidth(0, self.width()-200)
@@ -100,7 +100,7 @@ class PyTrailerWidget(QMainWindow):
         scrollArea.setMinimumSize(QSize(400,350))
 
         self.mainArea = mlistLayout
-        self.loadGroup("Just added")
+        self.loadGroup(self.tr("Just added"))
         centralWidget.setLayout(vbox)
         self.setCentralWidget(centralWidget)
 
@@ -118,8 +118,7 @@ class PyTrailerWidget(QMainWindow):
         i=1
         for cat, url in self.categories:
             movieMenu.addAction(self.tr(cat), self.slotCreate(cat),
-                                QKeySequence(self.tr("F%d" % i,
-                                "Movies|%s" % cat)))
+                                QKeySequence("F%d" % i))
             i = i + 1
         aboutMenu = self.menuBar().addMenu(self.tr("&Help"))
 
@@ -143,7 +142,7 @@ class PyTrailerWidget(QMainWindow):
         return slot
 
     def groupChange(self, button):
-        self.loadGroup(str(button.text()))
+        self.loadGroup(button.text())
 
     def unloadCurrentGroup(self):
         while not self.readAheadTaskQueue.empty():
@@ -163,7 +162,7 @@ class PyTrailerWidget(QMainWindow):
                 url = "http://trailers.apple.com%s" % catURL
                 break
 
-        if groupName == "Search":
+        if groupName == self.tr("Search"):
             d = PyTrailerSearch(self)
             if d.exec_() == QDialog.Accepted:
                 url = "%s%s" % (url, d.ui.lineEdit.text())
@@ -226,15 +225,15 @@ class PyTrailerWidget(QMainWindow):
             trailerName = item.url.split('/')[-1]
             statusText = None
             if item.status == DownloadStatus.IN_PROGRESS:
-                statusText = "%d %% done" % item.percent
+                statusText = "%d %% %s" % (item.percent, self.tr("done"))
             elif item.status == DownloadStatus.DONE:
-                statusText = "Done"
+                statusText = self.tr("Done")
             elif item.status == DownloadStatus.ERROR:
-                statusText = "Error"
+                statusText = self.tr("Error")
             elif item.status == DownloadStatus.WAITING:
-                statusText = "Waiting"
+                statusText = self.tr("Waiting")
             else:
-                statusText = "Unknown"
+                statusText = self.tr("Unknown")
 
             match = self.statusView.findItems(trailerName,Qt.MatchExactly)
             if match and len(match) > 0:

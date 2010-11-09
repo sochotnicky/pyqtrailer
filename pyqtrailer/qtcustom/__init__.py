@@ -33,9 +33,8 @@ class MovieItemWidget(QFrame):
             locale.resetlocale()
             releaseDate = releaseDate.strftime("%x")
         else:
-            releaseDate = "Unknown release date"
-        titleLabel = QLabel("<h2>%s</h2> (Release date: %s)" %
-        (movie.title, releaseDate), self)
+            releaseDate = self.tr("Unknown")
+        titleLabel = QLabel("<h2>%s</h2> (%s %s)" % (movie.title, self.tr("Release date:"), releaseDate), self)
         self.setFrameStyle(QFrame.Panel | QFrame.Sunken);
 
         self.titlebox.addWidget(titleLabel)
@@ -48,20 +47,20 @@ class MovieItemWidget(QFrame):
 
         mainArea = QVBoxLayout()
         self.mainArea = mainArea
-        genre = QLabel("<b>Genre(s): </b>%s" %
-                       self.__get_movie_info(movie, "genre", True))
+        genre = QLabel("<b>%s</b>%s" % (self.tr("Genre(s): "),
+                                          self.__get_movie_info(movie, "genre", True)))
         mainArea.addWidget(genre)
 
-        studio = QLabel("<b>Studio: </b>%s" %
-                        self.__get_movie_info(movie, "studio"))
+        studio = QLabel("<b>%s</b>%s" % (self.tr("Studio: "),
+                                           self.__get_movie_info(movie, "studio")))
         mainArea.addWidget(studio)
 
-        directors = QLabel("<b>Director(s): </b>%s" %
-                           self.__get_movie_info(movie, "directors"))
+        directors = QLabel("<b>%s</b>%s" % (self.tr("Director(s): "),
+                                              self.__get_movie_info(movie, "directors")))
         mainArea.addWidget(directors)
 
-        actors = QLabel("<b>Actors: </b>%s" %
-                        self.__get_movie_info(movie, "actors", True))
+        actors = QLabel("<b>%s</b>%s" % (self.tr("Actors: "),
+                                               self.__get_movie_info(movie, "actors", True)))
         mainArea.addWidget(actors)
         actors.setWordWrap(True)
         mainArea.addStretch(1)
@@ -77,7 +76,7 @@ class MovieItemWidget(QFrame):
         self.setLayout(topLevelLayout)
 
     def __get_movie_info(self, movie, info, join=False):
-        ret = "Unknown"
+        ret = self.tr("Unknown")
         if hasattr(movie, info):
             if join:
                 ret = ", ".join(getattr(movie, info))
@@ -124,13 +123,13 @@ class MovieItemWidget(QFrame):
                                    PyTrailerSettings.getQualityFromURL(trailerLink))
         lab = QLabel('<a href="%s">%s</a>' % (trailerLink, trailerName), self)
         hbox= QHBoxLayout()
-        button=QPushButton("Download")
+        button=QPushButton(self.tr("Download"))
         self.downloadButtons.addButton(button, ids)
         self.button_mapping[ids] = trailerLink
         hbox.addStretch(1)
         hbox.addWidget(lab)
         hbox.addWidget(button)
-        button=QPushButton("View")
+        button=QPushButton(self.tr("View"))
         self.viewButtons.addButton(button, ids)
         hbox.addWidget(button)
         self.mainArea.addLayout(hbox)
@@ -232,7 +231,7 @@ class PyTrailerSettings(QDialog):
         for fn, fregex in PyTrailerSettings.filters:
             if re.match(fregex, url):
                 return fn
-        return "Unknown quality"
+        return self.tr("Unknown quality")
 
 class PyTrailerAbout(QDialog):
     def __init__(self, parent):
