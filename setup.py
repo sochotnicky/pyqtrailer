@@ -51,7 +51,7 @@ setup(name='pyqtrailer',
       requires=["pytrailer"],
       install_requires=['pytrailer>=0.5',"python-dateutil >= 1.5"],
       classifiers=['Development Status :: 4 - Beta',
-                   'License :: OSI Approved :: GNU General Public License (GPL)'
+                   'License :: OSI Approved :: GNU General Public License (GPL)',
                    'Programming Language :: Python :: 2.6',
                    'Topic :: Software Development :: User Interfaces',
                    'Topic :: Multimedia :: Video'],

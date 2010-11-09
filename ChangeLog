@@ -1,3 +1,17 @@
+2010-11-09  Version 0.5.0  Stanislav Ochotnicky  <sochotnicky@gmail.com>
+	Requires >=pytrailer-0.5.0
+
+	Features added:
+	* Add "Search" button (working)
+	* Add loading animation
+	* Speed up startup
+	* Enable translations
+	* Add sk_SK translation
+
+	Bugs fixed:
+	* Added ChangeLog to sdist
+	* Code cleanups
+
 2010-10-22  Version 0.4.1  Stanislav Ochotnicky  <sochotnicky@gmail.com>
 
 	Bugs fixed:
