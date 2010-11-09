@@ -60,6 +60,7 @@ class PyTrailerWidget(QMainWindow):
     def init_widget(self):
 
         self.refreshTimer = QTimer(self)
+        self.list_loader = None
         self.refreshTimer.timeout.connect(self.refreshMovies)
         self.refreshTimer.start(1000)
         self.setWindowTitle(self.tr("PyTrailer - Apple Trailer Downloader"))
@@ -187,23 +188,11 @@ class PyTrailerWidget(QMainWindow):
         self.unloadCurrentGroup()
         self.loadID = random.random()
         self.loading.setVisible(True)
-        self.movieList = amt.getMoviesFromJSON(url)
-        for i in range(len(self.movieList)):
-            self.readAheadTaskQueue.put((i, self.movieList[i], self.loadID))
-        try:
-            filters = json.loads(self.config.get("DEFAULT","filters"))
-        except ValueError:
-            # we have old config load old style pickle
-            import pickle
-            filters = pickle.loads(self.config.get("DEFAULT","filters"))
+        self.list_loader , child_conn = multiprocessing.Pipe()
+        self.list_loader_p = multiprocessing.Process(target=movieListLoader,
+                                    args=(child_conn,url))
+        self.list_loader_p.start()
 
-        for movie in self.movieList:
-            w=MovieItemWidget(movie, filters, self.scrollArea)
-            w.setVisible(False)
-            w.downloadClicked.connect(self.downloadTrailer)
-            w.viewClicked.connect(self.viewTrailer)
-            self.movieDict[movie.title] = w
-            self.mainArea.addWidget(w)
 
     def saveConfig(self):
         with open(self.configPath, 'w') as configfile:
@@ -216,7 +205,11 @@ class PyTrailerWidget(QMainWindow):
             p.terminate()
 
     def refreshMovies(self):
-        changed = False
+        if self.list_loader and self.list_loader.poll():
+            self.movieList = self.list_loader.recv()
+            self.display_group()
+            self.list_loader_p.join()
+
         self.refreshDownloadStatus()
         while not self.readAheadDoneQueue.empty():
             i, updatedMovie, loadID = self.readAheadDoneQueue.get_nowait()
@@ -235,7 +228,7 @@ class PyTrailerWidget(QMainWindow):
                     break
 
         # hide loading image when all movies are visible
-        if self.readAheadTaskQueue.empty():
+        if self.readAheadTaskQueue.empty() and len(self.movieDict) != 0:
             allVisible = True
             for widget in self.movieDict:
                 if not self.movieDict[widget].isVisible():
@@ -244,6 +237,25 @@ class PyTrailerWidget(QMainWindow):
 
             if allVisible:
                 self.loading.setVisible(False)
+
+    def display_group(self):
+        self.list_loader = None
+        for i in range(len(self.movieList)):
+            self.readAheadTaskQueue.put((i, self.movieList[i], self.loadID))
+        try:
+            filters = json.loads(self.config.get("DEFAULT","filters"))
+        except ValueError:
+            # we have old config load old style pickle
+            import pickle
+            filters = pickle.loads(self.config.get("DEFAULT","filters"))
+
+        for movie in self.movieList:
+            w=MovieItemWidget(movie, filters, self.scrollArea)
+            w.setVisible(False)
+            w.downloadClicked.connect(self.downloadTrailer)
+            w.viewClicked.connect(self.viewTrailer)
+            self.movieDict[movie.title] = w
+            self.mainArea.addWidget(w)
 
     def refreshDownloadStatus(self):
 
@@ -303,6 +315,10 @@ def movieReadAhead(taskQueue, doneQueue):
             doneQueue.put((i, movie, loadID))
         except:
             raise
+
+def movieListLoader(conn, url):
+    conn.send(amt.getMoviesFromJSON(url))
+    conn.close()
 
 
 if __name__ == "__main__":
