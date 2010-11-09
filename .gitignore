@@ -3,3 +3,4 @@ build/
 dist/
 *_ui.py
 *.qm
+pyqtrailer/qtcustom/resources.py

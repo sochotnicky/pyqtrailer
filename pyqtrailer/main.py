@@ -16,6 +16,7 @@ from PyQt4.QtGui import *
 
 import pytrailer as amt
 from .qtcustom import *
+from .qtcustom import resources
 from .downloader import TrailerDownloader, DownloadStatus
 
 class PyTrailerWidget(QMainWindow):
@@ -89,8 +90,22 @@ class PyTrailerWidget(QMainWindow):
         statusView.setRootIsDecorated(False)
         statusView.setColumnWidth(0, self.width()-200)
         self.statusView = statusView
+
+        self.loading = QLabel(self)
+        self.loading.setSizePolicy(QSizePolicy.Expanding,
+                              QSizePolicy.Expanding)
+        self.loading.setAlignment(Qt.AlignCenter)
+        self.loading.setMinimumWidth(164)
+        self.loading.setMinimumHeight(24)
+        self.loading.setMaximumHeight(24)
+        self.mov = QMovie(':/animation/loading', QByteArray(), self)
+        self.loading.setMovie(self.mov)
+        self.mov.start()
+        self.loading.setVisible(True)
+
         vbox = QVBoxLayout()
         vbox.addLayout(hbox)
+        vbox.addWidget(self.loading)
         vbox.addWidget(scrollArea)
         vbox.addWidget(statusView)
         mlistLayout = QVBoxLayout()
@@ -168,11 +183,10 @@ class PyTrailerWidget(QMainWindow):
                 url = "%s%s" % (url, d.ui.lineEdit.text())
             else:
                 return
-        print(url)
 
         self.unloadCurrentGroup()
         self.loadID = random.random()
-
+        self.loading.setVisible(True)
         self.movieList = amt.getMoviesFromJSON(url)
         for i in range(len(self.movieList)):
             self.readAheadTaskQueue.put((i, self.movieList[i], self.loadID))
@@ -219,6 +233,17 @@ class PyTrailerWidget(QMainWindow):
                     w.setVisible(True)
                 else:
                     break
+
+        # hide loading image when all movies are visible
+        if self.readAheadTaskQueue.empty():
+            allVisible = True
+            for widget in self.movieDict:
+                if not self.movieDict[widget].isVisible():
+                    allVisible = False
+                    break
+
+            if allVisible:
+                self.loading.setVisible(False)
 
     def refreshDownloadStatus(self):
 

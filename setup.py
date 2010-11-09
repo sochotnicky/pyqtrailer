@@ -35,6 +35,10 @@ class build_py(_build_py):
             command = ["pyuic4","-o",out, ui]
             subprocess.Popen(command)
             self.byte_compile(out)
+        res = "pyqtrailer/qtcustom/resources.py"
+        command = ["pyrcc4", "-py3", "resources.qrc",
+                   "-o", res]
+        subprocess.Popen(command)
         regen_messages()
         _build_py.run(self)
 
