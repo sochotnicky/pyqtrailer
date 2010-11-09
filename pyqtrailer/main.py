@@ -133,7 +133,7 @@ class PyTrailerWidget(QMainWindow):
         movieMenu = self.menuBar().addMenu(self.tr("&Movies"))
         i=1
         for cat, url in self.categories:
-            movieMenu.addAction(self.tr(cat), self.slotCreate(cat),
+            movieMenu.addAction(cat, self.slotCreate(cat),
                                 QKeySequence("F%d" % i))
             i = i + 1
         aboutMenu = self.menuBar().addMenu(self.tr("&Help"))

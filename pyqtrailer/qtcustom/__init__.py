@@ -204,7 +204,7 @@ class PyTrailerSettings(QDialog):
     def accept(self):
         self.config.set("DEFAULT","downloadDir",
                         str(self.ui.downloadPath.text()))
-        playerStr = self.ui.playerCommand.text().replace('%','%%')
+        playerStr = str(self.ui.playerCommand.text().replace('%','%%'))
         self.config.set("DEFAULT","player", playerStr)
         activeFilters = []
         for i in range(self.ui.filterList.count()):

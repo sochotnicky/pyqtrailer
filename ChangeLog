@@ -1,3 +1,9 @@
+2010-11-09  Version 0.5.1  Stanislav Ochotnicky  <sochotnicky@gmail.com>
+
+	Bugs fixed:
+	* Translations not loading
+	* Exceptions when running with non-english locale
+
 2010-11-09  Version 0.5.0  Stanislav Ochotnicky  <sochotnicky@gmail.com>
 	Requires >=pytrailer-0.5.0
 
