@@ -1,20 +1,24 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
 msgid ""
 msgstr ""
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Virgin-Header: remove this line if you change anything in the header.\n"
 "X-Language: en_GB\n"
 "X-Source-Language: en_GB\n"
-"X-Qt-Contexts: true\n"
 
-#: about_ui.py:122
-msgctxt "AboutDialog|"
+#. ts-context AboutDialog
+#: about_ui.py:127
+#, fuzzy
 msgid "About PyQTrailer"
 msgstr ""
 
-#: about_ui.py:123
-msgctxt "AboutDialog|"
+#. ts-context AboutDialog
+#: about_ui.py:128
+#, fuzzy
 msgid ""
 "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
 "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -29,8 +33,9 @@ msgid ""
 "font-style:normal;\">PyQTrailer</span></p></body></html>"
 msgstr ""
 
-#: about_ui.py:128
-msgctxt "AboutDialog|"
+#. ts-context AboutDialog
+#: about_ui.py:133
+#, fuzzy
 msgid ""
 "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
 "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -45,8 +50,9 @@ msgid ""
 "font-style:normal;\">0.2.2</span></p></body></html>"
 msgstr ""
 
-#: about_ui.py:133
-msgctxt "AboutDialog|"
+#. ts-context AboutDialog
+#: about_ui.py:138
+#, fuzzy
 msgid ""
 "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
 "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -76,13 +82,15 @@ msgid ""
 "color:#0000ff;\">https://github.com/sochotnicky/pyqtrailer/issues</span></a></p></body></html>"
 msgstr ""
 
-#: about_ui.py:142
-msgctxt "AboutDialog|"
+#. ts-context AboutDialog
+#: about_ui.py:147
+#, fuzzy
 msgid "About"
 msgstr ""
 
-#: about_ui.py:143
-msgctxt "AboutDialog|"
+#. ts-context AboutDialog
+#: about_ui.py:148
+#, fuzzy
 msgid ""
 "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
 "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -102,13 +110,15 @@ msgid ""
 "font-family:'Sans Serif';\"></p></body></html>"
 msgstr ""
 
-#: about_ui.py:149
-msgctxt "AboutDialog|"
+#. ts-context AboutDialog
+#: about_ui.py:154
+#, fuzzy
 msgid "Authors"
 msgstr ""
 
-#: about_ui.py:150
-msgctxt "AboutDialog|"
+#. ts-context AboutDialog
+#: about_ui.py:155
+#, fuzzy
 msgid ""
 "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
 "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -2650,268 +2660,324 @@ msgid ""
 "font-family:'Sans Serif';\"></p></body></html>"
 msgstr ""
 
-#: about_ui.py:829
-msgctxt "AboutDialog|"
+#. ts-context AboutDialog
+#: about_ui.py:834
+#, fuzzy
 msgid "License Agreement"
 msgstr ""
 
-#: about_ui.py:830
-msgctxt "AboutDialog|"
+#. ts-context AboutDialog
+#: about_ui.py:835
+#, fuzzy
 msgid "Close"
 msgstr ""
 
+#. ts-context MovieItemWidget
 #: __init__.py:79
-msgctxt "MovieItemWidget|"
+#, fuzzy
 msgid "Unknown"
 msgstr ""
 
+#. ts-context MovieItemWidget
 #: __init__.py:37
-msgctxt "MovieItemWidget|"
+#, fuzzy
 msgid "Release date:"
 msgstr ""
 
+#. ts-context MovieItemWidget
 #: __init__.py:50
-msgctxt "MovieItemWidget|"
+#, fuzzy
 msgid "Genre(s): "
 msgstr ""
 
+#. ts-context MovieItemWidget
 #: __init__.py:54
-msgctxt "MovieItemWidget|"
+#, fuzzy
 msgid "Studio: "
 msgstr ""
 
+#. ts-context MovieItemWidget
 #: __init__.py:58
-msgctxt "MovieItemWidget|"
+#, fuzzy
 msgid "Director(s): "
 msgstr ""
 
+#. ts-context MovieItemWidget
 #: __init__.py:62
-msgctxt "MovieItemWidget|"
+#, fuzzy
 msgid "Actors: "
 msgstr ""
 
+#. ts-context MovieItemWidget
 #: __init__.py:126
-msgctxt "MovieItemWidget|"
+#, fuzzy
 msgid "Download"
 msgstr ""
 
+#. ts-context MovieItemWidget
 #: __init__.py:132
-msgctxt "MovieItemWidget|"
+#, fuzzy
 msgid "View"
 msgstr ""
 
+#. ts-context PyTrailerSettings
 #: __init__.py:234
-msgctxt "PyTrailerSettings|"
+#, fuzzy
 msgid "Unknown quality"
 msgstr ""
 
-#: main.py:102
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:118
+#, fuzzy
 msgid "Just added"
 msgstr ""
 
-#: main.py:26
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:27
+#, fuzzy
 msgid "Exclusive"
 msgstr ""
 
-#: main.py:27
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:28
+#, fuzzy
 msgid "Only HD"
 msgstr ""
 
-#: main.py:28
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:29
+#, fuzzy
 msgid "Most popular"
 msgstr ""
 
-#: main.py:164
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:180
+#, fuzzy
 msgid "Search"
 msgstr ""
 
-#: main.py:63
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:65
+#, fuzzy
 msgid "PyTrailer - Apple Trailer Downloader"
 msgstr ""
 
-#: main.py:86
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:88
+#, fuzzy
 msgid "Trailer"
 msgstr ""
 
-#: main.py:86
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:88
+#, fuzzy
 msgid "Download status"
 msgstr ""
 
-#: main.py:107
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:123
+#, fuzzy
 msgid "&File"
 msgstr ""
 
-#: main.py:109
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:125
+#, fuzzy
 msgid "Settings"
 msgstr ""
 
-#: main.py:109
-msgctxt "PyTrailerWidget|File~|Settings"
+#. ts-context PyTrailerWidget
+#: main.py:125
+#, fuzzy
+msgctxt "File|Settings"
 msgid "Ctrl+S"
 msgstr ""
 
-#: main.py:112
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:128
+#, fuzzy
 msgid "Quit"
 msgstr ""
 
-#: main.py:112
-msgctxt "PyTrailerWidget|File~|Quit"
+#. ts-context PyTrailerWidget
+#: main.py:128
+#, fuzzy
+msgctxt "File|Quit"
 msgid "Ctrl+Q"
 msgstr ""
 
-#: main.py:116
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:132
+#, fuzzy
 msgid "&Movies"
 msgstr ""
 
-#: main.py:122
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:138
+#, fuzzy
 msgid "&Help"
 msgstr ""
 
-#: main.py:124
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:140
+#, fuzzy
 msgid "&About"
 msgstr ""
 
-#: main.py:124
-msgctxt "PyTrailerWidget|Help~|About PyQTrailer"
+#. ts-context PyTrailerWidget
+#: main.py:140
+#, fuzzy
+msgctxt "Help|About PyQTrailer"
 msgid "Ctrl+A"
 msgstr ""
 
-#: main.py:227
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:266
+#, fuzzy
 msgid "done"
 msgstr ""
 
-#: main.py:229
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:268
+#, fuzzy
 msgid "Done"
 msgstr ""
 
-#: main.py:231
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:270
+#, fuzzy
 msgid "Error"
 msgstr ""
 
-#: main.py:233
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:272
+#, fuzzy
 msgid "Waiting"
 msgstr ""
 
-#: main.py:235
-msgctxt "PyTrailerWidget|"
+#. ts-context PyTrailerWidget
+#: main.py:274
+#, fuzzy
 msgid "Unknown"
 msgstr ""
 
-#: search_ui.py:38
-msgctxt "Search|"
+#. ts-context Search
+#: search_ui.py:43
+#, fuzzy
 msgid "Dialog"
 msgstr ""
 
-#: search_ui.py:39
-msgctxt "Search|"
+#. ts-context Search
+#: search_ui.py:44
+#, fuzzy
 msgid "Search for:"
 msgstr ""
 
-#: settings_ui.py:134
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:139
+#, fuzzy
 msgid "Dialog"
 msgstr ""
 
-#: settings_ui.py:135
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:140
+#, fuzzy
 msgid "&Download path"
 msgstr ""
 
-#: settings_ui.py:136
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:141
+#, fuzzy
 msgid "Browse"
 msgstr ""
 
-#: settings_ui.py:137
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:142
+#, fuzzy
 msgid "&Quality priority"
 msgstr ""
 
-#: settings_ui.py:140
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:145
+#, fuzzy
 msgid "480p"
 msgstr ""
 
-#: settings_ui.py:141
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:146
+#, fuzzy
 msgid "720p"
 msgstr ""
 
-#: settings_ui.py:142
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:147
+#, fuzzy
 msgid "1080p"
 msgstr ""
 
-#: settings_ui.py:143
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:148
+#, fuzzy
 msgid "640x360"
 msgstr ""
 
-#: settings_ui.py:144
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:149
+#, fuzzy
 msgid "320x180"
 msgstr ""
 
-#: settings_ui.py:145
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:150
+#, fuzzy
 msgid "480x204"
 msgstr ""
 
-#: settings_ui.py:148
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:153
+#, fuzzy
 msgid "..."
 msgstr ""
 
-#: settings_ui.py:149
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:154
+#, fuzzy
 msgid "&Performance"
 msgstr ""
 
-#: settings_ui.py:150
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:155
+#, fuzzy
 msgid "Read ahead processes"
 msgstr ""
 
-#: settings_ui.py:151
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:156
+#, fuzzy
 msgid "Maxiumum parallel downloads"
 msgstr ""
 
-#: settings_ui.py:152
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:157
+#, fuzzy
 msgid "Viewing"
 msgstr ""
 
-#: settings_ui.py:153
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:158
+#, fuzzy
 msgid "Command: "
 msgstr ""
 
-#: settings_ui.py:154
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:159
+#, fuzzy
 msgid "mplayer -user-agent %a %u"
 msgstr ""
 
-#: settings_ui.py:155
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:160
+#, fuzzy
 msgid ""
 "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
 "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -2926,8 +2992,9 @@ msgid ""
 "URL</p></body></html>"
 msgstr ""
 
-#: settings_ui.py:160
-msgctxt "SettingsDialog|"
+#. ts-context SettingsDialog
+#: settings_ui.py:165
+#, fuzzy
 msgid ""
 "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
 "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
