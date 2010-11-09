@@ -18,18 +18,16 @@ import pytrailer as amt
 from .qtcustom import *
 from .downloader import TrailerDownloader, DownloadStatus
 
-categories = [('Just added', '/trailers/home/feeds/just_added.json'),
-              ('Exclusive', '/trailers/home/feeds/exclusive.json'),
-              ('Only HD', '/trailers/home/feeds/just_hd.json'),
-              ('Most popular', '/trailers/home/feeds/most_pop.json'),
-              ('Search', '/trailers/home/scripts/quickfind.php?&q=')]
-
-
 class PyTrailerWidget(QMainWindow):
     configPath = '%s/.pyqtrailer' % os.path.expanduser('~')
 
     def __init__(self, *args):
         QMainWindow.__init__(self, *args)
+        self.categories = [(self.tr('Just added'), '/trailers/home/feeds/just_added.json'),
+                     (self.tr('Exclusive'), '/trailers/home/feeds/exclusive.json'),
+                     (self.tr('Only HD'), '/trailers/home/feeds/just_hd.json'),
+                     (self.tr('Most popular'), '/trailers/home/feeds/most_pop.json'),
+                     (self.tr('Search'), '/trailers/home/scripts/quickfind.php?&q=')]
         self.config = configparser.SafeConfigParser({'downloadDir':'/tmp',
                                        'filters':json.dumps([y for x, y in PyTrailerSettings.filters]),
                                        'readAhead':'4',
@@ -69,7 +67,7 @@ class PyTrailerWidget(QMainWindow):
         hbox = QHBoxLayout()
         group = QButtonGroup(hbox)
         group.setExclusive(True)
-        for cat, url in categories:
+        for cat, url in self.categories:
             but = QPushButton(cat, self)
             but.setCheckable(True)
             group.addButton(but)
@@ -118,7 +116,7 @@ class PyTrailerWidget(QMainWindow):
 
         movieMenu = self.menuBar().addMenu(self.tr("&Movies"))
         i=1
-        for cat, url in categories:
+        for cat, url in self.categories:
             movieMenu.addAction(self.tr(cat), self.slotCreate(cat),
                                 QKeySequence(self.tr("F%d" % i,
                                 "Movies|%s" % cat)))
@@ -160,7 +158,7 @@ class PyTrailerWidget(QMainWindow):
 
     def loadGroup(self, groupName):
         url = None
-        for cat, catURL in categories:
+        for cat, catURL in self.categories:
             if cat == groupName:
                 url = "http://trailers.apple.com%s" % catURL
                 break
