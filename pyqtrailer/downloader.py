@@ -109,9 +109,9 @@ def downloadFunc(trailerURL, command, taskDict):
                            DownloadStatus.IN_PROGRESS,
                            perc)
             except IOError as e:
-                print("Ignoring interrupted assignement exception")
                 if e.errno is not errno.EINTR:
                     raise
+                print("Ignoring interrupted assignement exception")
 
     p.wait()
     if p.returncode is not 0:
