@@ -44,7 +44,7 @@ class PyTrailerWidget(QMainWindow):
 
         self.readAheadProcess = []
         for i in range(readAhead):
-            p = multiprocessing.Process(target=movieReadAhead,
+            p = multiprocessing.Process(target=PyTrailerWidget.movieReadAhead,
                         args=(self.readAheadTaskQueue,
                               self.readAheadDoneQueue))
             p.start()
@@ -189,7 +189,7 @@ class PyTrailerWidget(QMainWindow):
         self.loadID = random.random()
         self.loading.setVisible(True)
         self.list_loader , child_conn = multiprocessing.Pipe()
-        self.list_loader_p = multiprocessing.Process(target=movieListLoader,
+        self.list_loader_p = multiprocessing.Process(target=PyTrailerWidget.movieListLoader,
                                     args=(child_conn,url))
         self.list_loader_p.start()
 
@@ -302,23 +302,25 @@ class PyTrailerWidget(QMainWindow):
         subprocess.Popen(player)
 
 
-def movieReadAhead(taskQueue, doneQueue):
-    """Function to be run in separate process,
-    caching additional movie information
-    """
-    while True:
-        i, movie, loadID = taskQueue.get()
-        try:
-            movie.poster
-            movie.trailerLinks
-            movie.description
-            doneQueue.put((i, movie, loadID))
-        except:
-            raise
+    @staticmethod
+    def movieReadAhead(taskQueue, doneQueue):
+        """Function to be run in separate process,
+        caching additional movie information
+        """
+        while True:
+            i, movie, loadID = taskQueue.get()
+            try:
+                movie.poster
+                movie.trailerLinks
+                movie.description
+                doneQueue.put((i, movie, loadID))
+            except:
+                raise
 
-def movieListLoader(conn, url):
-    conn.send(amt.getMoviesFromJSON(url))
-    conn.close()
+    @staticmethod
+    def movieListLoader(conn, url):
+        conn.send(amt.getMoviesFromJSON(url))
+        conn.close()
 
 
 if __name__ == "__main__":
