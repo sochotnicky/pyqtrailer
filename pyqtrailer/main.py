@@ -2,9 +2,13 @@
 import sys
 import os
 import json
+import pickle
 import multiprocessing
 import random
 import subprocess
+import locale
+from time import mktime
+import errno
 try:
     import ConfigParser as configparser
 except ImportError:
@@ -13,14 +17,18 @@ except ImportError:
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+import dateutil.parser as dparser
+
 
 import pytrailer as amt
 from .qtcustom import *
 from .qtcustom import resources
 from .downloader import TrailerDownloader, DownloadStatus
 
+
 class PyTrailerWidget(QMainWindow):
     configPath = '%s/.pyqtrailer' % os.path.expanduser('~')
+    cachePath = '%s/.pyqtrailer.cache' % os.path.expanduser('~')
 
     def __init__(self, *args):
         QMainWindow.__init__(self, *args)
@@ -36,6 +44,7 @@ class PyTrailerWidget(QMainWindow):
                                        'player':'mplayer -user-agent %%a %%u'})
         readAhead = int(self.config.get("DEFAULT","readAhead"))
         self.config.read(self.configPath)
+        self.load_cache()
         self.movieDict = {}
         self.readAheadTaskQueue = multiprocessing.Queue()
         self.readAheadDoneQueue = multiprocessing.Queue()
@@ -200,6 +209,7 @@ class PyTrailerWidget(QMainWindow):
 
     def closeEvent(self, closeEvent):
         self.saveConfig()
+        self.save_cache()
         self.downloader.stop()
         for p in self.readAheadProcess:
             p.terminate()
@@ -219,6 +229,7 @@ class PyTrailerWidget(QMainWindow):
             oldMovie.poster = updatedMovie.poster
             oldMovie.trailerLinks = updatedMovie.trailerLinks
             oldMovie.description = updatedMovie.description
+            self.add_to_cache(oldMovie)
             if oldMovie.title in self.movieDict:
                 w = self.movieDict[oldMovie.title]
                 if w is not None:
@@ -291,6 +302,7 @@ class PyTrailerWidget(QMainWindow):
                                       self.config.get("DEFAULT","downloadDir")))
         self.trailerDownloadDict[str(url)] = DownloadStatus(str(url),
                            DownloadStatus.WAITING)
+
     def viewTrailer(self, url):
         player = self.config.get("DEFAULT","player").split(' ')
         for i in range(len(player)):
@@ -301,6 +313,39 @@ class PyTrailerWidget(QMainWindow):
 
         subprocess.Popen(player)
 
+    def add_to_cache(self, movie):
+        latestUpdate = PyTrailerWidget.get_latest_trailer_date(movie)
+        self.movie_cache[movie.baseURL] = (latestUpdate,
+                                           movie.poster,
+                                           movie.trailerLinks,
+                                           movie.description)
+
+    def load_cache(self):
+        try:
+            with open(self.cachePath,"rb") as f:
+                self.movie_cache = pickle.load(f)
+        except IOError as e:
+            if e.errno == errno.ENOENT:
+                self.movie_cache = {}
+                self.movie_cache['last_update'] = 0
+            else:
+                raise
+
+    def save_cache(self):
+        with open(self.cachePath,"wb") as f:
+            pickle.dump(self.movie_cache, f)
+
+    @staticmethod
+    def get_latest_trailer_date(movie):
+        tsMax = 0
+        for trailer in movie.trailers:
+            locale.setlocale(locale.LC_ALL, "C")
+            pdate = dparser.parse(trailer['postdate'])
+            locale.resetlocale()
+            ts = mktime(pdate.timetuple())
+            if ts > tsMax:
+                tsMax = ts
+        return tsMax
 
     @staticmethod
     def movieReadAhead(taskQueue, doneQueue):
