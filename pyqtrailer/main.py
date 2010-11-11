@@ -55,7 +55,8 @@ class PyTrailerWidget(QMainWindow):
         for i in range(readAhead):
             p = multiprocessing.Process(target=PyTrailerWidget.movieReadAhead,
                         args=(self.readAheadTaskQueue,
-                              self.readAheadDoneQueue))
+                              self.readAheadDoneQueue,
+                              self.movie_cache))
             p.start()
             self.readAheadProcess.append(p)
 
@@ -348,16 +349,23 @@ class PyTrailerWidget(QMainWindow):
         return tsMax
 
     @staticmethod
-    def movieReadAhead(taskQueue, doneQueue):
+    def movieReadAhead(taskQueue, doneQueue, cache):
         """Function to be run in separate process,
         caching additional movie information
         """
         while True:
             i, movie, loadID = taskQueue.get()
             try:
-                movie.poster
-                movie.trailerLinks
-                movie.description
+                latestUpdate = PyTrailerWidget.get_latest_trailer_date(movie)
+                if movie.baseURL in cache and cache[movie.baseURL][0] >= latestUpdate:
+                    cached_data = cache[movie.baseURL]
+                    movie.poster = cached_data[1]
+                    movie.trailerLinks = cached_data[2]
+                    movie.description = cached_data[3]
+                else:
+                    movie.poster
+                    movie.trailerLinks
+                    movie.description
                 doneQueue.put((i, movie, loadID))
             except:
                 raise
