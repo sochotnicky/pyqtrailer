@@ -1,5 +1,5 @@
 
-from multiprocessing import Process, Queue, active_children
+from multiprocessing import Process
 import subprocess
 import os
 import signal
@@ -25,6 +25,7 @@ class DownloadStatus:
 
 
 class TrailerDownloader(object):
+    wget_pids=[]
 
     def __init__(self, taskQueue, taskDict, parallelProcesses = 1):
         """taskQueue = Queue() of (url, targetDir) to download
@@ -37,12 +38,12 @@ class TrailerDownloader(object):
         self.parallelProcesses = parallelProcesses
         self.processes = []
 
-        self._downloadFunc = trailer_download
+        self._downloadFunc = TrailerDownloader.__trailer_download
 
 
     def start(self):
         for i in range(self.parallelProcesses):
-            p = Process(target=trailer_download,
+            p = Process(target=TrailerDownloader.__trailer_download,
                         args=(self.taskQueue,
                               self.taskDict))
             p.start()
@@ -53,78 +54,85 @@ class TrailerDownloader(object):
             p.terminate()
 
 
+    @staticmethod
+    def __trailer_download(taskQueue, taskDict):
+        # we need to have consistent wget output
+        locale.setlocale(locale.LC_ALL, "C")
+        signal.signal(signal.SIGTERM, TrailerDownloader.term_handler)
+        try:
+            while True:
+                trailerURL, targetDir = taskQueue.get()
+                command = ['wget','-cN',
+                           '-U',
+                           'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)',
+                           trailerURL,
+                           '-P',
+                           targetDir,
+                           '--progress=dot:mega']
+                TrailerDownloader.__process_wget_output(trailerURL, command, taskDict)
+        except ClosingException:
+            pass
 
 
-def trailer_download(taskQueue, taskDict):
-    # we need to have consistent wget output
-    locale.setlocale(locale.LC_ALL, "C")
-    signal.signal(signal.SIGTERM, term_handler)
-    try:
+    @staticmethod
+    def __process_wget_output(trailerURL, command, taskDict):
+        """This function runs wget and reads its output. Each dot
+        or comma counts for 65 KiB of downloaded data
+        """
+        print("Executing: %s" % " ".join(command))
+        p = subprocess.Popen(command,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        taskDict[trailerURL] = DownloadStatus(trailerURL,
+                                              DownloadStatus.IN_PROGRESS)
+        TrailerDownloader.wget_pids.append(p.pid)
+        totalsize = 0
         while True:
-            trailerURL, targetDir = taskQueue.get()
-            command = ['wget','-cN',
-                       '-U',
-                       'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)',
-                       trailerURL,
-                       '-P',
-                       targetDir,
-                       '--progress=dot:mega']
-            download_func(trailerURL, command, taskDict)
-    except ClosingException as e:
-        pass
+            line = p.stderr.readline().decode()
+            if len(line) == 0:
+                break
+            if line.find('Length:') != -1:
+                # wget prints size of the file
+                totalsize = int(line.split(' ')[1])
+                break
 
-wgetPids=[]
-def download_func(trailerURL, command, taskDict):
-    print("Executing: %s" % " ".join(command))
-    p = subprocess.Popen(command,
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE)
-    taskDict[trailerURL] = DownloadStatus(trailerURL,
-                                          DownloadStatus.IN_PROGRESS)
-    wgetPids.append(p.pid)
-    totalsize = 0
-    while True:
-        line = p.stderr.readline().decode()
-        if len(line) == 0:
-            break
-        if line.find('Length:') != -1:
-            totalsize = int(line.split(' ')[1])
-            break
+        # now we start counting dots :-)
+        downloaded = 0
+        Reader = codecs.getreader("utf-8")
+        stdReader = Reader(p.stderr)
+        while True:
+            x = stdReader.read(1)
 
-    # now we start counting dots :-)
-    downloaded = 0
-    Reader = codecs.getreader("utf-8")
-    stdReader = Reader(p.stderr)
-    while True:
-        x = stdReader.read(1)
+            if len(x) == 0:
+                break
+            if x == '.' or x ==',':
+                # comma means we are resuming so that's why we are
+                # counting it too
+                downloaded = downloaded + 64 * 1024
+            perc = downloaded * 100 // totalsize
+            if perc % 5 == 0:
+                try:
+                    taskDict[trailerURL] = DownloadStatus(trailerURL,
+                               DownloadStatus.IN_PROGRESS,
+                               perc)
+                except IOError as e:
+                    if e.errno is not errno.EINTR:
+                        raise
+                    print("Ignoring interrupted assignement exception")
 
-        if len(x) == 0:
-            break
-        if x == '.' or x ==',':
-            downloaded = downloaded + 64 * 1024
-        perc = downloaded * 100 // totalsize
-        if perc % 5 == 0:
-            try:
-                taskDict[trailerURL] = DownloadStatus(trailerURL,
-                           DownloadStatus.IN_PROGRESS,
-                           perc)
-            except IOError as e:
-                if e.errno is not errno.EINTR:
-                    raise
-                print("Ignoring interrupted assignement exception")
+        p.wait()
+        if p.returncode is not 0:
+            taskDict[trailerURL] = DownloadStatus(trailerURL,
+                               DownloadStatus.ERROR)
+        else:
+            taskDict[trailerURL] = DownloadStatus(trailerURL,
+                               DownloadStatus.DONE)
+        TrailerDownloader.wget_pids.remove(p.pid)
 
-    p.wait()
-    if p.returncode is not 0:
-        taskDict[trailerURL] = DownloadStatus(trailerURL,
-                           DownloadStatus.ERROR)
-    else:
-        taskDict[trailerURL] = DownloadStatus(trailerURL,
-                           DownloadStatus.DONE)
-    wgetPids.remove(p.pid)
-
-
-def term_handler(signum, frame):
-    for p in wgetPids:
-        print('Stopping wget process ', p)
-        os.kill(p, signal.SIGTERM)
-    raise ClosingException("Finishing up")
+    @staticmethod
+    def term_handler(signum, frame):
+        """Handles closing of main process. Stops running wget downloads"""
+        for p in TrailerDownloader.wget_pids:
+            print('Stopping wget process ', p)
+            os.kill(p, signal.SIGTERM)
+        raise ClosingException("Finishing up")
