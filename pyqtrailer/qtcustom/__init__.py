@@ -120,7 +120,7 @@ class MovieItemWidget(QFrame):
 
     def _add_buttons(self, trailerName, trailerLink, ids):
         trailerName = "%s (%s)" % (trailerName,
-                                   PyTrailerSettings.getQualityFromURL(trailerLink))
+                                   PyTrailerSettings.get_quality_from_url(trailerLink))
         lab = QLabel('<a href="%s">%s</a>' % (trailerLink, trailerName), self)
         hbox= QHBoxLayout()
         button=QPushButton(self.tr("Download"))
@@ -164,8 +164,8 @@ class PyTrailerSettings(QDialog):
         self.ui.spinParallelDownload.setValue(int(config.get("DEFAULT","parallelDownload")))
 
         self.ui.browseButton.clicked.connect(self.browseDir)
-        self.ui.qualityUp.clicked.connect(self.filterUp)
-        self.ui.qualityDown.clicked.connect(self.filterDown)
+        self.ui.qualityUp.clicked.connect(self.filter_up)
+        self.ui.qualityDown.clicked.connect(self.filter_down)
 
         self.ui.playerCommand.setText(config.get("DEFAULT","player"))
 
@@ -183,7 +183,7 @@ class PyTrailerSettings(QDialog):
                 self.ui.filterList.addItem(filt[0])
                 added.append(filt[0])
 
-    def filterUp(self):
+    def filter_up(self):
         currentRow = self.ui.filterList.currentRow()
         if currentRow == 0:
             return
@@ -192,7 +192,7 @@ class PyTrailerSettings(QDialog):
         self.ui.filterList.insertItem(currentRow-1, item)
         self.ui.filterList.setCurrentRow(currentRow-1)
 
-    def filterDown(self):
+    def filter_down(self):
         currentRow = self.ui.filterList.currentRow()
         if currentRow == self.ui.filterList.count()-1:
             return
@@ -227,7 +227,7 @@ class PyTrailerSettings(QDialog):
             self.ui.downloadPath.setText(directory)
 
     @staticmethod
-    def getQualityFromURL(url):
+    def get_quality_from_url(url):
         for fn, fregex in PyTrailerSettings.filters:
             if re.match(fregex, url):
                 return fn

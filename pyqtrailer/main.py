@@ -50,7 +50,7 @@ class PyTrailerWidget(QMainWindow):
 
         self.readAheadProcess = []
         for i in range(readAhead):
-            p = multiprocessing.Process(target=PyTrailerWidget.movieReadAhead,
+            p = multiprocessing.Process(target=PyTrailerWidget.movie_readahead,
                         args=(self.readAheadTaskQueue,
                               self.readAheadDoneQueue,
                               self.movie_cache))
@@ -68,7 +68,7 @@ class PyTrailerWidget(QMainWindow):
 
         self.refreshTimer = QTimer(self)
         self.list_loader = None
-        self.refreshTimer.timeout.connect(self.refreshMovies)
+        self.refreshTimer.timeout.connect(self.refresh_movies)
         self.refreshTimer.start(1000)
         self.setWindowTitle(self.tr("PyTrailer - Apple Trailer Downloader"))
 
@@ -82,7 +82,7 @@ class PyTrailerWidget(QMainWindow):
             group.addButton(but)
             hbox.addWidget(but)
 
-        group.buttonClicked.connect(self.groupChange)
+        group.buttonClicked.connect(self.group_change)
 
         self.scrollArea = QScrollArea(centralWidget)
         scrollArea = self.scrollArea
@@ -123,7 +123,7 @@ class PyTrailerWidget(QMainWindow):
         scrollArea.setMinimumSize(QSize(400,350))
 
         self.mainArea = mlistLayout
-        self.loadGroup(self.tr("Just added"))
+        self.load_group(self.tr("Just added"))
         centralWidget.setLayout(vbox)
         self.setCentralWidget(centralWidget)
 
@@ -140,7 +140,7 @@ class PyTrailerWidget(QMainWindow):
         movieMenu = self.menuBar().addMenu(self.tr("&Movies"))
         i=1
         for cat, url in self.categories:
-            movieMenu.addAction(cat, self.slotCreate(cat),
+            movieMenu.addAction(cat, self.slot_create(cat),
                                 QKeySequence("F%d" % i))
             i = i + 1
         aboutMenu = self.menuBar().addMenu(self.tr("&Help"))
@@ -153,21 +153,21 @@ class PyTrailerWidget(QMainWindow):
     def settings(self):
         d = PyTrailerSettings(self.config)
         if d.exec_() == QDialog.Accepted:
-            self.saveConfig()
+            self.save_config()
 
     def about(self):
         w = PyTrailerAbout(self)
         w.exec_()
 
-    def slotCreate(self, group):
+    def slot_create(self, group):
         def slot():
-            self.loadGroup(group)
+            self.load_group(group)
         return slot
 
-    def groupChange(self, button):
-        self.loadGroup(button.text())
+    def group_change(self, button):
+        self.load_group(button.text())
 
-    def unloadCurrentGroup(self):
+    def unload_current_group(self):
         while not self.readAheadTaskQueue.empty():
             self.readAheadTaskQueue.get()
 
@@ -178,7 +178,7 @@ class PyTrailerWidget(QMainWindow):
             widget.close()
             widget = self.mainArea.takeAt(0)
 
-    def loadGroup(self, groupName):
+    def load_group(self, groupName):
         url = None
         for cat, catURL in self.categories:
             if cat == groupName:
@@ -192,33 +192,34 @@ class PyTrailerWidget(QMainWindow):
             else:
                 return
 
-        self.unloadCurrentGroup()
+        self.unload_current_group()
         self.loadID = random.random()
         self.loading.setVisible(True)
         self.list_loader , child_conn = multiprocessing.Pipe()
-        self.list_loader_p = multiprocessing.Process(target=PyTrailerWidget.movieListLoader,
+        self.list_loader_p = multiprocessing.Process(target=PyTrailerWidget.movielist_loader,
                                     args=(child_conn,url))
         self.list_loader_p.start()
 
 
-    def saveConfig(self):
+    def save_config(self):
         with open(self.configPath, 'w') as configfile:
             self.config.write(configfile)
 
-    def closeEvent(self, closeEvent):
-        self.saveConfig()
-        self.save_cache()
+    def closeEvent(self, close_event):
         self.downloader.stop()
         for p in self.readAheadProcess:
             p.terminate()
+        self.list_loader_p.terminate()
+        self.save_config()
+        self.save_cache()
 
-    def refreshMovies(self):
+    def refresh_movies(self):
         if self.list_loader and self.list_loader.poll():
             self.movieList = self.list_loader.recv()
             self.display_group()
             self.list_loader_p.join()
 
-        self.refreshDownloadStatus()
+        self.refresh_download_status()
         while not self.readAheadDoneQueue.empty():
             i, updatedMovie, loadID = self.readAheadDoneQueue.get_nowait()
             if self.loadID != loadID:
@@ -261,12 +262,12 @@ class PyTrailerWidget(QMainWindow):
         for movie in self.movieList:
             w=MovieItemWidget(movie, filters, self.scrollArea)
             w.setVisible(False)
-            w.downloadClicked.connect(self.downloadTrailer)
-            w.viewClicked.connect(self.viewTrailer)
+            w.downloadClicked.connect(self.download_trailer)
+            w.viewClicked.connect(self.view_trailer)
             self.movieDict[movie.title] = w
             self.mainArea.addWidget(w)
 
-    def refreshDownloadStatus(self):
+    def refresh_download_status(self):
 
         for i in list(self.trailerDownloadDict.keys()):
             item = self.trailerDownloadDict[i]
@@ -295,13 +296,13 @@ class PyTrailerWidget(QMainWindow):
         if len(list(self.trailerDownloadDict.keys())) and not self.statusView.isVisible():
             self.statusView.setVisible(True)
 
-    def downloadTrailer(self, url):
+    def download_trailer(self, url):
         self.trailerDownloadQueue.put((str(url),
                                       self.config.get("DEFAULT","downloadDir")))
         self.trailerDownloadDict[str(url)] = DownloadStatus(str(url),
                            DownloadStatus.WAITING)
 
-    def viewTrailer(self, url):
+    def view_trailer(self, url):
         player = self.config.get("DEFAULT","player").split(' ')
         for i in range(len(player)):
             if player[i] == '%a':
@@ -335,7 +336,7 @@ class PyTrailerWidget(QMainWindow):
 
 
     @staticmethod
-    def movieReadAhead(taskQueue, doneQueue, cache):
+    def movie_readahead(taskQueue, doneQueue, cache):
         """Function to be run in separate process,
         caching additional movie information
         """
@@ -357,7 +358,10 @@ class PyTrailerWidget(QMainWindow):
                 raise
 
     @staticmethod
-    def movieListLoader(conn, url):
+    def movielist_loader(conn, url):
+        """Function to be run in a separate process. It will send
+        movie list through pipe. Use poll() to verify that data is ready.
+        """
         conn.send(amt.getMoviesFromJSON(url))
         conn.close()
 

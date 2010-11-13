@@ -37,12 +37,12 @@ class TrailerDownloader(object):
         self.parallelProcesses = parallelProcesses
         self.processes = []
 
-        self._downloadFunc = trailerDownload
+        self._downloadFunc = trailer_download
 
 
     def start(self):
         for i in range(self.parallelProcesses):
-            p = Process(target=trailerDownload,
+            p = Process(target=trailer_download,
                         args=(self.taskQueue,
                               self.taskDict))
             p.start()
@@ -55,7 +55,7 @@ class TrailerDownloader(object):
 
 
 
-def trailerDownload(taskQueue, taskDict):
+def trailer_download(taskQueue, taskDict):
     # we need to have consistent wget output
     locale.setlocale(locale.LC_ALL, "C")
     signal.signal(signal.SIGTERM, term_handler)
@@ -69,12 +69,12 @@ def trailerDownload(taskQueue, taskDict):
                        '-P',
                        targetDir,
                        '--progress=dot:mega']
-            downloadFunc(trailerURL, command, taskDict)
+            download_func(trailerURL, command, taskDict)
     except ClosingException as e:
         pass
 
 wgetPids=[]
-def downloadFunc(trailerURL, command, taskDict):
+def download_func(trailerURL, command, taskDict):
     print("Executing: %s" % " ".join(command))
     p = subprocess.Popen(command,
                          stdout=subprocess.PIPE,
