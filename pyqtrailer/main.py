@@ -6,8 +6,6 @@ import pickle
 import multiprocessing
 import random
 import subprocess
-import locale
-from time import mktime
 import errno
 try:
     import ConfigParser as configparser
@@ -17,7 +15,6 @@ except ImportError:
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-import dateutil.parser as dparser
 
 
 import pytrailer as amt
@@ -315,7 +312,7 @@ class PyTrailerWidget(QMainWindow):
         subprocess.Popen(player)
 
     def add_to_cache(self, movie):
-        latestUpdate = PyTrailerWidget.get_latest_trailer_date(movie)
+        latestUpdate = movie.get_latest_trailer_date()
         self.movie_cache[movie.baseURL] = (latestUpdate,
                                            movie.poster,
                                            movie.trailerLinks,
@@ -336,17 +333,6 @@ class PyTrailerWidget(QMainWindow):
         with open(self.cachePath,"wb") as f:
             pickle.dump(self.movie_cache, f)
 
-    @staticmethod
-    def get_latest_trailer_date(movie):
-        tsMax = 0
-        for trailer in movie.trailers:
-            locale.setlocale(locale.LC_ALL, "C")
-            pdate = dparser.parse(trailer['postdate'])
-            locale.resetlocale()
-            ts = mktime(pdate.timetuple())
-            if ts > tsMax:
-                tsMax = ts
-        return tsMax
 
     @staticmethod
     def movieReadAhead(taskQueue, doneQueue, cache):
@@ -356,7 +342,7 @@ class PyTrailerWidget(QMainWindow):
         while True:
             i, movie, loadID = taskQueue.get()
             try:
-                latestUpdate = PyTrailerWidget.get_latest_trailer_date(movie)
+                latestUpdate = movie.get_latest_trailer_date()
                 if movie.baseURL in cache and cache[movie.baseURL][0] >= latestUpdate:
                     cached_data = cache[movie.baseURL]
                     movie.poster = cached_data[1]
