@@ -39,35 +39,19 @@ class PyTrailerWidget(QMainWindow):
                                        'readAhead':'4',
                                        'parallelDownload':'2',
                                        'player':'mplayer -user-agent %%a %%u'})
-        readAhead = int(self.config.get("DEFAULT","readAhead"))
+        self.list_loader = None
+        self.list_loader_p = None
+        self.movieDict = {}
         self.config.read(self.configPath)
         self.load_cache()
-        self.movieDict = {}
-        self.readAheadTaskQueue = multiprocessing.Queue()
-        self.readAheadDoneQueue = multiprocessing.Queue()
-        self.trailerDownloadQueue = multiprocessing.Queue()
-        self.trailerDownloadDict = multiprocessing.Manager().dict()
-
-        self.readAheadProcess = []
-        for i in range(readAhead):
-            p = multiprocessing.Process(target=PyTrailerWidget.movie_readahead,
-                        args=(self.readAheadTaskQueue,
-                              self.readAheadDoneQueue,
-                              self.movie_cache))
-            p.start()
-            self.readAheadProcess.append(p)
-
-        self.downloader = TrailerDownloader(self.trailerDownloadQueue,
-                               self.trailerDownloadDict,
-                               int(self.config.get("DEFAULT","parallelDownload")))
-        self.downloader.start()
+        self.init_preloaders()
         self.init_widget()
         self.init_menus()
+        self.downloader.start()
 
     def init_widget(self):
 
         self.refreshTimer = QTimer(self)
-        self.list_loader = None
         self.refreshTimer.timeout.connect(self.refresh_movies)
         self.refreshTimer.start(1000)
         self.setWindowTitle(self.tr("PyTrailer - Apple Trailer Downloader"))
@@ -150,6 +134,26 @@ class PyTrailerWidget(QMainWindow):
                             QKeySequence(self.tr("Ctrl+A",
                                                  "Help|About PyQTrailer")))
 
+    def init_preloaders(self):
+        self.readAheadTaskQueue = multiprocessing.Queue()
+        self.readAheadDoneQueue = multiprocessing.Queue()
+        self.trailerDownloadQueue = multiprocessing.Queue()
+        self.trailerDownloadDict = multiprocessing.Manager().dict()
+
+        self.readAheadProcess = []
+        readAhead = int(self.config.get("DEFAULT","readAhead"))
+        for i in range(readAhead):
+            p = multiprocessing.Process(target=PyTrailerWidget.movie_readahead,
+                        args=(self.readAheadTaskQueue,
+                              self.readAheadDoneQueue,
+                              self.movie_cache))
+            p.start()
+            self.readAheadProcess.append(p)
+
+        self.downloader = TrailerDownloader(self.trailerDownloadQueue,
+                               self.trailerDownloadDict,
+                               int(self.config.get("DEFAULT","parallelDownload")))
+
     def settings(self):
         d = PyTrailerSettings(self.config)
         if d.exec_() == QDialog.Accepted:
@@ -171,6 +175,12 @@ class PyTrailerWidget(QMainWindow):
         while not self.readAheadTaskQueue.empty():
             self.readAheadTaskQueue.get()
 
+        if self.list_loader:
+            self.list_loader.close()
+            self.list_loader = None
+
+        if self.list_loader_p:
+            self.list_loader_p.terminate()
         widget = self.mainArea.takeAt(0)
         while widget != None:
             widget = widget.widget()
