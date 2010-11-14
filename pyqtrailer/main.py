@@ -24,21 +24,28 @@ from .downloader import TrailerDownloader, DownloadStatus
 
 
 class PyTrailerWidget(QMainWindow):
+    """Main PyQTrailer window. This is where it all starts"""
+
     configPath = '%s/.pyqtrailer' % os.path.expanduser('~')
     cachePath = '%s/.pyqtrailer.cache' % os.path.expanduser('~')
 
     def __init__(self, *args):
         QMainWindow.__init__(self, *args)
+        # these are all categories apple is providing for now
         self.categories = [(self.tr('Just added'), '/trailers/home/feeds/just_added.json'),
                      (self.tr('Exclusive'), '/trailers/home/feeds/exclusive.json'),
                      (self.tr('Only HD'), '/trailers/home/feeds/just_hd.json'),
                      (self.tr('Most popular'), '/trailers/home/feeds/most_pop.json'),
                      (self.tr('Search'), '/trailers/home/scripts/quickfind.php?&q=')]
+
+        # pick sane defaults
         self.config = configparser.SafeConfigParser({'downloadDir':'/tmp',
                                        'filters':json.dumps([y for x, y in PyTrailerSettings.filters]),
                                        'readAhead':'4',
                                        'parallelDownload':'2',
                                        'player':'mplayer -user-agent %%a %%u'})
+
+        # run initializations
         self.list_loader = None
         self.list_loader_p = None
         self.movieDict = {}
@@ -50,6 +57,7 @@ class PyTrailerWidget(QMainWindow):
         self.downloader.start()
 
     def init_widget(self):
+        """Initialize main child widgets, layouts etc."""
 
         self.refreshTimer = QTimer(self)
         self.refreshTimer.timeout.connect(self.refresh_movies)
@@ -135,9 +143,17 @@ class PyTrailerWidget(QMainWindow):
                                                  "Help|About PyQTrailer")))
 
     def init_preloaders(self):
+        """Start all preloading processes and prepare data for them"""
+
+        # taskQueue - trailers to be cached go there
         self.readAheadTaskQueue = multiprocessing.Queue()
+        # doneQueue - cached trailes come from there
         self.readAheadDoneQueue = multiprocessing.Queue()
+
+        # trailers to be downloaded are put there
         self.trailerDownloadQueue = multiprocessing.Queue()
+
+        # this is a url:DownloadStatus dictionary
         self.trailerDownloadDict = multiprocessing.Manager().dict()
 
         self.readAheadProcess = []
@@ -154,6 +170,13 @@ class PyTrailerWidget(QMainWindow):
                                self.trailerDownloadDict,
                                int(self.config.get("DEFAULT","parallelDownload")))
 
+    def slot_create(self, group):
+        """This meta-function is used to create anonymous slot for each
+        trailer group."""
+        def slot():
+            self.load_group(group)
+        return slot
+
     def settings(self):
         d = PyTrailerSettings(self.config)
         if d.exec_() == QDialog.Accepted:
@@ -163,15 +186,14 @@ class PyTrailerWidget(QMainWindow):
         w = PyTrailerAbout(self)
         w.exec_()
 
-    def slot_create(self, group):
-        def slot():
-            self.load_group(group)
-        return slot
 
     def group_change(self, button):
         self.load_group(button.text())
 
     def unload_current_group(self):
+        """Current trailer groups gets unloaded and preloader
+        processes stopped
+        """
         while not self.readAheadTaskQueue.empty():
             self.readAheadTaskQueue.get()
 
@@ -181,6 +203,8 @@ class PyTrailerWidget(QMainWindow):
 
         if self.list_loader_p:
             self.list_loader_p.terminate()
+
+        # remove trailer widgets from main area
         widget = self.mainArea.takeAt(0)
         while widget != None:
             widget = widget.widget()
@@ -203,8 +227,13 @@ class PyTrailerWidget(QMainWindow):
                 return
 
         self.unload_current_group()
+        # loadID is used to identify what group task belonged to
+        # we can use it to make sure we don't display trailers from
+        # different group after being cached
         self.loadID = random.random()
         self.loading.setVisible(True)
+
+        # run loading in separate process
         self.list_loader , child_conn = multiprocessing.Pipe()
         self.list_loader_p = multiprocessing.Process(target=PyTrailerWidget.movielist_loader,
                                     args=(child_conn,url))
@@ -224,15 +253,21 @@ class PyTrailerWidget(QMainWindow):
         self.save_cache()
 
     def refresh_movies(self):
+        # if we are loading new group and movie list is ready, get it
         if self.list_loader and self.list_loader.poll():
             self.movieList = self.list_loader.recv()
             self.display_group()
             self.list_loader_p.join()
-
+        # let's refresh status of trailer downloads
         self.refresh_download_status()
+
+        # now to refreshing trailer widgets when posters, descriptions
+        # and trailer links have been cached
         while not self.readAheadDoneQueue.empty():
             i, updatedMovie, loadID = self.readAheadDoneQueue.get_nowait()
             if self.loadID != loadID:
+                # this means the cached movie comes from previous
+                # group (we must have changed group recently)
                 continue
             oldMovie = self.movieList[i]
             oldMovie.poster = updatedMovie.poster
@@ -259,9 +294,14 @@ class PyTrailerWidget(QMainWindow):
                 self.loading.setVisible(False)
 
     def display_group(self):
+        """Makes the hard work to prepare current group for being
+        displayed
+
+        adds tasks to readahead process and creates widgets"""
         self.list_loader = None
         for i in range(len(self.movieList)):
             self.readAheadTaskQueue.put((i, self.movieList[i], self.loadID))
+
         try:
             filters = json.loads(self.config.get("DEFAULT","filters"))
         except ValueError:
@@ -269,6 +309,7 @@ class PyTrailerWidget(QMainWindow):
             import pickle
             filters = pickle.loads(self.config.get("DEFAULT","filters"))
 
+        # we create widgets but hide them until they are cached
         for movie in self.movieList:
             w=MovieItemWidget(movie, filters, self.scrollArea)
             w.setVisible(False)
@@ -278,7 +319,8 @@ class PyTrailerWidget(QMainWindow):
             self.mainArea.addWidget(w)
 
     def refresh_download_status(self):
-
+        """Makes sure download status is up to date
+        """
         for i in list(self.trailerDownloadDict.keys()):
             item = self.trailerDownloadDict[i]
             trailerName = item.url.split('/')[-1]
@@ -307,6 +349,8 @@ class PyTrailerWidget(QMainWindow):
             self.statusView.setVisible(True)
 
     def download_trailer(self, url):
+        """Adds appropriate tasks to download trailer and sets initial
+        DownloadStatus"""
         self.trailerDownloadQueue.put((str(url),
                                       self.config.get("DEFAULT","downloadDir")))
         self.trailerDownloadDict[str(url)] = DownloadStatus(str(url),
@@ -323,6 +367,7 @@ class PyTrailerWidget(QMainWindow):
         subprocess.Popen(player)
 
     def add_to_cache(self, movie):
+        """Adds movie to disk cache"""
         latestUpdate = movie.get_latest_trailer_date()
         self.movie_cache[movie.baseURL] = (latestUpdate,
                                            movie.poster,
@@ -330,6 +375,7 @@ class PyTrailerWidget(QMainWindow):
                                            movie.description)
 
     def load_cache(self):
+        """Loads trailer info cache from disk"""
         try:
             with open(self.cachePath,"rb") as f:
                 self.movie_cache = pickle.load(f)
@@ -341,6 +387,7 @@ class PyTrailerWidget(QMainWindow):
                 raise
 
     def save_cache(self):
+        """Saves trailer info cache to disk"""
         with open(self.cachePath,"wb") as f:
             pickle.dump(self.movie_cache, f)
 
