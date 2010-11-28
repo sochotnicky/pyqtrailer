@@ -1,3 +1,13 @@
+2010-11-28  Version 0.6.0  Stanislav Ochotnicky  <sochotnicky@gmail.com>
+	Requires >= pytrailer-0.6.0
+
+	Features added:
+	* Cache movie information (speed up loading)
+
+	Other:
+	* Bit of documentation added
+	* Refactoring of code
+
 2010-11-10  Version 0.5.2  Stanislav Ochotnicky  <sochotnicky@gmail.com>
 
 	Bugs fixed:
