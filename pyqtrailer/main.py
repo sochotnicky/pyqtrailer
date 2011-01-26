@@ -263,7 +263,9 @@ class PyTrailerWidget(QMainWindow):
             p.terminate()
         self.list_loader_p.terminate()
         if self.player_proc:
-            self.player_proc.terminate()
+            self.player_proc.poll()
+            if self.player_proc.returncode is None:
+                self.player_proc.terminate()
         self.save_config()
         self.save_cache()
         log.debug("closing application")
