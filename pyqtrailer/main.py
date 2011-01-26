@@ -46,6 +46,7 @@ class PyTrailerWidget(QMainWindow):
                                        'player':'mplayer -user-agent %%a %%u'})
 
         # run initializations
+        self.player_proc = None
         self.list_loader = None
         self.list_loader_p = None
         self.movieDict = {}
@@ -348,6 +349,19 @@ class PyTrailerWidget(QMainWindow):
         if len(list(self.trailerDownloadDict.keys())) and not self.statusView.isVisible():
             self.statusView.setVisible(True)
 
+        if self.player_proc:
+            self.player_proc.poll()
+            ret = self.player_proc.returncode
+            if ret and ret != 0:
+                QMessageBox.critical(self,
+                                self.tr("Player error"),
+                                self.tr(
+"""Player indicates error while playing selected trailer.
+Please verify player configuration is correct.
+"""))
+                self.player_proc = None
+
+
     def download_trailer(self, url):
         """Adds appropriate tasks to download trailer and sets initial
         DownloadStatus"""
@@ -364,7 +378,21 @@ class PyTrailerWidget(QMainWindow):
             elif player[i] == '%u':
                 player[i] = url
 
-        subprocess.Popen(player)
+        try:
+            self.player_proc = subprocess.Popen(player, stderr=subprocess.PIPE)
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                # player doesn't exist
+                QMessageBox.critical(self,
+                                self.tr("Player executable not found"),
+                                self.tr("Player could not be run.\nPlease verify player configuration is correct"))
+            else:
+                QMessageBox.critical(self,
+                                self.tr("Player execution failure"),
+                                self.tr("Unknown error while running player."))
+
+
+
 
     def add_to_cache(self, movie):
         """Adds movie to disk cache"""
@@ -398,8 +426,8 @@ class PyTrailerWidget(QMainWindow):
         caching additional movie information
         """
         while True:
-            i, movie, loadID = taskQueue.get()
             try:
+                i, movie, loadID = taskQueue.get()
                 latestUpdate = movie.get_latest_trailer_date()
                 if movie.baseURL in cache and cache[movie.baseURL][0] >= latestUpdate:
                     cached_data = cache[movie.baseURL]
