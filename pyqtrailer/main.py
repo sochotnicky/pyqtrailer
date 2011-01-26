@@ -7,9 +7,14 @@ import multiprocessing
 import random
 import subprocess
 import errno
+import traceback
+import socket
+
 try:
     import ConfigParser as configparser
+    from urllib2 import URLError
 except ImportError:
+    from urllib import URLError
     import configparser as configparser
 
 from PyQt4.QtCore import *
@@ -21,6 +26,7 @@ import pytrailer as amt
 from .qtcustom import *
 from .qtcustom import resources
 from .downloader import TrailerDownloader, DownloadStatus
+from logger import log
 
 
 class PyTrailerWidget(QMainWindow):
@@ -31,6 +37,7 @@ class PyTrailerWidget(QMainWindow):
 
     def __init__(self, *args):
         QMainWindow.__init__(self, *args)
+        log.debug("main window initialization starting")
         # these are all categories apple is providing for now
         self.categories = [(self.tr('Just added'), '/trailers/home/feeds/just_added.json'),
                      (self.tr('Exclusive'), '/trailers/home/feeds/exclusive.json'),
@@ -45,6 +52,7 @@ class PyTrailerWidget(QMainWindow):
                                        'parallelDownload':'2',
                                        'player':'mplayer -user-agent %%a %%u'})
 
+        log.info("settings loaded: %s" % self.config.items("DEFAULT"))
         # run initializations
         self.player_proc = None
         self.list_loader = None
@@ -56,6 +64,7 @@ class PyTrailerWidget(QMainWindow):
         self.init_widget()
         self.init_menus()
         self.downloader.start()
+        log.debug("main window initialization done")
 
     def init_widget(self):
         """Initialize main child widgets, layouts etc."""
@@ -195,6 +204,7 @@ class PyTrailerWidget(QMainWindow):
         """Current trailer groups gets unloaded and preloader
         processes stopped
         """
+        log.debug("unloading previous group")
         while not self.readAheadTaskQueue.empty():
             self.readAheadTaskQueue.get()
 
@@ -228,6 +238,7 @@ class PyTrailerWidget(QMainWindow):
                 return
 
         self.unload_current_group()
+        log.debug("loading group %s" % groupName)
         # loadID is used to identify what group task belonged to
         # we can use it to make sure we don't display trailers from
         # different group after being cached
@@ -242,6 +253,7 @@ class PyTrailerWidget(QMainWindow):
 
 
     def save_config(self):
+        log.debug("saving config file")
         with open(self.configPath, 'w') as configfile:
             self.config.write(configfile)
 
@@ -250,14 +262,20 @@ class PyTrailerWidget(QMainWindow):
         for p in self.readAheadProcess:
             p.terminate()
         self.list_loader_p.terminate()
+        if self.player_proc:
+            self.player_proc.terminate()
         self.save_config()
         self.save_cache()
+        log.debug("closing application")
 
     def refresh_movies(self):
         # if we are loading new group and movie list is ready, get it
         if self.list_loader and self.list_loader.poll():
-            self.movieList = self.list_loader.recv()
-            self.display_group()
+            exception, self.movieList = self.list_loader.recv()
+            if exception:
+                self.report_network_problem(exception)
+            else:
+                self.display_group()
             self.list_loader_p.join()
         # let's refresh status of trailer downloads
         self.refresh_download_status()
@@ -353,11 +371,14 @@ class PyTrailerWidget(QMainWindow):
             self.player_proc.poll()
             ret = self.player_proc.returncode
             if ret and ret != 0:
+                log.error("player return code was non-null. Player output:")
+                log.error(self.player_proc.stderr.read())
                 QMessageBox.critical(self,
                                 self.tr("Player error"),
                                 self.tr(
 """Player indicates error while playing selected trailer.
 Please verify player configuration is correct.
+For player error output see log file
 """))
                 self.player_proc = None
 
@@ -365,6 +386,7 @@ Please verify player configuration is correct.
     def download_trailer(self, url):
         """Adds appropriate tasks to download trailer and sets initial
         DownloadStatus"""
+        log.info("initializing download of %s" % url)
         self.trailerDownloadQueue.put((str(url),
                                       self.config.get("DEFAULT","downloadDir")))
         self.trailerDownloadDict[str(url)] = DownloadStatus(str(url),
@@ -378,9 +400,12 @@ Please verify player configuration is correct.
             elif player[i] == '%u':
                 player[i] = url
 
+        log.info("running player: %s" % player)
         try:
             self.player_proc = subprocess.Popen(player, stderr=subprocess.PIPE)
         except OSError as e:
+            log.error("player could not be executed")
+            log.error(traceback.format_exc())
             if e.errno == errno.ENOENT:
                 # player doesn't exist
                 QMessageBox.critical(self,
@@ -396,6 +421,7 @@ Please verify player configuration is correct.
 
     def add_to_cache(self, movie):
         """Adds movie to disk cache"""
+        log.debug("adding movie to cache: %s" % movie.title)
         latestUpdate = movie.get_latest_trailer_date()
         self.movie_cache[movie.baseURL] = (latestUpdate,
                                            movie.poster,
@@ -404,6 +430,7 @@ Please verify player configuration is correct.
 
     def load_cache(self):
         """Loads trailer info cache from disk"""
+        log.debug("loading cache from disk")
         try:
             with open(self.cachePath,"rb") as f:
                 self.movie_cache = pickle.load(f)
@@ -416,8 +443,17 @@ Please verify player configuration is correct.
 
     def save_cache(self):
         """Saves trailer info cache to disk"""
+        log.debug("saving cache to disk")
         with open(self.cachePath,"wb") as f:
             pickle.dump(self.movie_cache, f)
+
+    def report_network_problem(self, exception):
+        QMessageBox.critical(self,
+                             self.tr("Network error"),
+                             self.tr(
+"""There was a network problem when downloading movie list.
+Please check your network settings.
+"""))
 
 
     @staticmethod
@@ -428,6 +464,7 @@ Please verify player configuration is correct.
         while True:
             try:
                 i, movie, loadID = taskQueue.get()
+                log.debug("loading information about movie %s" % movie.title)
                 latestUpdate = movie.get_latest_trailer_date()
                 if movie.baseURL in cache and cache[movie.baseURL][0] >= latestUpdate:
                     cached_data = cache[movie.baseURL]
@@ -439,7 +476,15 @@ Please verify player configuration is correct.
                     movie.trailerLinks
                     movie.description
                 doneQueue.put((i, movie, loadID))
+            except socket.error as e:
+                log.error("network problem error while loading movie information: %s" % e)
+                log.error(traceback.format_exc())
+            except KeyboardInterrupt:
+                log.debug("keyboard interrupt. stopping movie readahead")
+                return
             except:
+                log.error("uncaught exception ocurred while doing readahead. Please report this!")
+                log.error(traceback.format_exc())
                 raise
 
     @staticmethod
@@ -447,13 +492,22 @@ Please verify player configuration is correct.
         """Function to be run in a separate process. It will send
         movie list through pipe. Use poll() to verify that data is ready.
         """
-        conn.send(amt.getMoviesFromJSON(url))
-        conn.close()
+        try:
+            log.info("getting movie list from %s" % url)
+            movies = amt.getMoviesFromJSON(url)
+            conn.send((None, movies))
+            conn.close()
+        except URLError as e:
+            log.error("network problem error while loading movie list: %s" % e)
+            log.error(traceback.format_exc())
+            conn.send((e, None))
+        except socket.error as e:
+            log.error("network problem error while loading movie list: %s" % e)
+            log.error(traceback.format_exc())
+            conn.send((e, None))
+        except Exception as e:
+            log.error("uncaught exception ocurred while loading movie list. Please report this!")
+            log.error(traceback.format_exc())
+            conn.send((e, None))
 
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    widget = PyTrailerWidget()
-    widget.resize(800, 600)
-    widget.show()
-    sys.exit(app.exec_())

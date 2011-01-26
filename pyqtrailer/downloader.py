@@ -59,6 +59,7 @@ class TrailerDownloader(object):
         # we need to have consistent wget output
         locale.setlocale(locale.LC_ALL, "C")
         signal.signal(signal.SIGTERM, TrailerDownloader.term_handler)
+        signal.signal(signal.SIGINT, TrailerDownloader.term_handler)
         try:
             while True:
                 trailerURL, targetDir = taskQueue.get()

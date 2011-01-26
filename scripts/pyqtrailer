@@ -8,12 +8,17 @@ from PyQt4.QtGui import *
 from pyqtrailer.main import PyTrailerWidget
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    translator = QTranslator(app)
-    translator.load("%s.qm" % locale.getlocale()[0],
-                    "/usr/share/pyqtrailer/lang/")
-    app.installTranslator(translator)
-    widget = PyTrailerWidget()
-    widget.resize(800, 600)
-    widget.show()
-    sys.exit(app.exec_())
+    try:
+        app = QApplication(sys.argv)
+        translator = QTranslator(app)
+        translator.load("%s.qm" % locale.getlocale()[0],
+                        "/usr/share/pyqtrailer/lang/")
+        app.installTranslator(translator)
+        widget = PyTrailerWidget()
+        widget.resize(800, 600)
+        widget.show()
+        sys.exit(app.exec_())
+    except Exception as e:
+        log.error("uncaught exception ocurred. Please report this!")
+        log.error(traceback.format_exc())
+        raise
