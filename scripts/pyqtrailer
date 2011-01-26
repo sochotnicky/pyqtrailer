@@ -2,12 +2,12 @@
 
 import sys
 import locale
+import traceback
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from pyqtrailer.main import PyTrailerWidget
-from logger import log, setup_log
-import traceback
+from pyqtrailer.logger import log, setup_log
 
 if __name__ == "__main__":
     try:
