@@ -6,9 +6,12 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from pyqtrailer.main import PyTrailerWidget
+from logger import log, setup_log
+import traceback
 
 if __name__ == "__main__":
     try:
+        setup_log()
         app = QApplication(sys.argv)
         translator = QTranslator(app)
         translator.load("%s.qm" % locale.getlocale()[0],

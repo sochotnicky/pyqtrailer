@@ -6,6 +6,7 @@ import signal
 import locale
 import errno
 import codecs
+from logger import log
 
 class ClosingException(Exception):
     pass
@@ -63,6 +64,7 @@ class TrailerDownloader(object):
         try:
             while True:
                 trailerURL, targetDir = taskQueue.get()
+                log.info("starting download process for %s" % trailerURL)
                 command = ['wget','-cN',
                            '-U',
                            'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)',
@@ -80,7 +82,7 @@ class TrailerDownloader(object):
         """This function runs wget and reads its output. Each dot
         or comma counts for 65 KiB of downloaded data
         """
-        print("Executing: %s" % " ".join(command))
+        log.info("executing: %s" % " ".join(command))
         p = subprocess.Popen(command,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
@@ -119,7 +121,7 @@ class TrailerDownloader(object):
                 except IOError as e:
                     if e.errno is not errno.EINTR:
                         raise
-                    print("Ignoring interrupted assignement exception")
+                    log.debug("ignoring interrupted assignement exception")
 
         p.wait()
         if p.returncode is not 0:
@@ -128,12 +130,13 @@ class TrailerDownloader(object):
         else:
             taskDict[trailerURL] = DownloadStatus(trailerURL,
                                DownloadStatus.DONE)
+        log.info("download of %s finished with status %d" % (trailerURL, p.returncode))
         TrailerDownloader.wget_pids.remove(p.pid)
 
     @staticmethod
     def term_handler(signum, frame):
         """Handles closing of main process. Stops running wget downloads"""
         for p in TrailerDownloader.wget_pids:
-            print('Stopping wget process ', p)
+            log.info('stopping wget process %d' % p)
             os.kill(p, signal.SIGTERM)
         raise ClosingException("Finishing up")
