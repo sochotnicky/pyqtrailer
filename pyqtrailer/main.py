@@ -15,7 +15,7 @@ try:
     import ConfigParser as configparser
     from urllib2 import URLError
 except ImportError:
-    from urllib import URLError
+    from urllib.error import URLError
     import configparser as configparser
 
 from PyQt4.QtCore import *
