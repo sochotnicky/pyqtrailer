@@ -9,6 +9,7 @@ import subprocess
 import errno
 import traceback
 import socket
+import signal
 
 try:
     import ConfigParser as configparser
@@ -27,6 +28,8 @@ from .qtcustom import *
 from .qtcustom import resources
 from .downloader import TrailerDownloader, DownloadStatus
 from logger import log
+
+term_closing = 0
 
 
 class PyTrailerWidget(QMainWindow):
@@ -64,13 +67,15 @@ class PyTrailerWidget(QMainWindow):
         self.init_widget()
         self.init_menus()
         self.downloader.start()
+        signal.signal(signal.SIGTERM, PyTrailerWidget.term_handler)
+        signal.signal(signal.SIGINT, PyTrailerWidget.term_handler)
         log.debug("main window initialization done")
 
     def init_widget(self):
         """Initialize main child widgets, layouts etc."""
 
         self.refreshTimer = QTimer(self)
-        self.refreshTimer.timeout.connect(self.refresh_movies)
+        self.refreshTimer.timeout.connect(self.refresh_wrapper)
         self.refreshTimer.start(1000)
         self.setWindowTitle(self.tr("PyTrailer - Apple Trailer Downloader"))
 
@@ -269,6 +274,13 @@ class PyTrailerWidget(QMainWindow):
         self.save_config()
         self.save_cache()
         log.debug("closing application")
+
+    def refresh_wrapper(self):
+        if not term_closing:
+            self.refresh_movies()
+        else:
+            self.refreshTimer.stop()
+            self.close()
 
     def refresh_movies(self):
         # if we are loading new group and movie list is ready, get it
@@ -513,3 +525,8 @@ Please check your network settings.
             conn.send((e, None))
 
 
+    @staticmethod
+    def term_handler(signum, frame):
+        """Handles closing of main process."""
+        global term_closing
+        term_closing = 1
