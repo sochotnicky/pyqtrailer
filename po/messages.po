@@ -2727,138 +2727,193 @@ msgid "Unknown quality"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:118
+#: main.py:132
 #, fuzzy
 msgid "Just added"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:27
+#: main.py:45
 #, fuzzy
 msgid "Exclusive"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:28
+#: main.py:46
 #, fuzzy
 msgid "Only HD"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:29
+#: main.py:47
 #, fuzzy
 msgid "Most popular"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:180
+#: main.py:237
 #, fuzzy
 msgid "Search"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:65
+#: main.py:79
 #, fuzzy
 msgid "PyTrailer - Apple Trailer Downloader"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:88
+#: main.py:102
 #, fuzzy
 msgid "Trailer"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:88
+#: main.py:102
 #, fuzzy
 msgid "Download status"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:123
+#: main.py:137
 #, fuzzy
 msgid "&File"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:125
+#: main.py:139
 #, fuzzy
 msgid "Settings"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:125
+#: main.py:139
 #, fuzzy
 msgctxt "File|Settings"
 msgid "Ctrl+S"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:128
+#: main.py:142
 #, fuzzy
 msgid "Quit"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:128
+#: main.py:142
 #, fuzzy
 msgctxt "File|Quit"
 msgid "Ctrl+Q"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:132
+#: main.py:146
 #, fuzzy
 msgid "&Movies"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:138
+#: main.py:152
 #, fuzzy
 msgid "&Help"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:140
+#: main.py:154
 #, fuzzy
 msgid "&About"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:140
+#: main.py:154
 #, fuzzy
 msgctxt "Help|About PyQTrailer"
 msgid "Ctrl+A"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:266
+#: main.py:361
 #, fuzzy
 msgid "done"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:268
+#: main.py:363
 #, fuzzy
 msgid "Done"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:270
+#: main.py:365
 #, fuzzy
 msgid "Error"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:272
+#: main.py:367
 #, fuzzy
 msgid "Waiting"
 msgstr ""
 
 #. ts-context PyTrailerWidget
-#: main.py:274
+#: main.py:369
 #, fuzzy
 msgid "Unknown"
+msgstr ""
+
+#. ts-context PyTrailerWidget
+#: main.py:389
+#, fuzzy
+msgid "Player error"
+msgstr ""
+
+#. ts-context PyTrailerWidget
+#: main.py:389
+#, fuzzy
+msgid ""
+"Player indicates error while playing selected trailer.\n"
+"Please verify player configuration is correct.\n"
+"For player error output see log file\n"
+msgstr ""
+
+#. ts-context PyTrailerWidget
+#: main.py:424
+#, fuzzy
+msgid "Player executable not found"
+msgstr ""
+
+#. ts-context PyTrailerWidget
+#: main.py:424
+#, fuzzy
+msgid ""
+"Player could not be run.\n"
+"Please verify player configuration is correct"
+msgstr ""
+
+#. ts-context PyTrailerWidget
+#: main.py:428
+#, fuzzy
+msgid "Player execution failure"
+msgstr ""
+
+#. ts-context PyTrailerWidget
+#: main.py:428
+#, fuzzy
+msgid "Unknown error while running player."
+msgstr ""
+
+#. ts-context PyTrailerWidget
+#: main.py:464
+#, fuzzy
+msgid "Network error"
+msgstr ""
+
+#. ts-context PyTrailerWidget
+#: main.py:464
+#, fuzzy
+msgid ""
+"There was a network problem when downloading movie list.\n"
+"Please check your network settings.\n"
 msgstr ""
 
 #. ts-context Search

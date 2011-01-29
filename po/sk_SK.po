@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "X-Virgin-Header: remove this line if you change anything in the header.\n"
-"X-Language: sk_SK\n"
+"X-Language: en_GB\n"
 "X-Source-Language: en_GB\n"
 
 #. ts-context AboutDialog
@@ -2735,117 +2735,171 @@ msgid "Unknown quality"
 msgstr "Neznáma kvalita"
 
 #. ts-context PyTrailerWidget
-#: main.py:118
+#: main.py:132
 msgid "Just added"
 msgstr "Práve pridané"
 
 #. ts-context PyTrailerWidget
-#: main.py:27
+#: main.py:45
 msgid "Exclusive"
 msgstr "Exkluzívne"
 
 #. ts-context PyTrailerWidget
-#: main.py:28
+#: main.py:46
 msgid "Only HD"
 msgstr "Iba HD"
 
 #. ts-context PyTrailerWidget
-#: main.py:29
+#: main.py:47
 msgid "Most popular"
 msgstr "Najpopulárnejšie"
 
 #. ts-context PyTrailerWidget
-#: main.py:180
+#: main.py:237
 msgid "Search"
 msgstr "Hľadať"
 
 #. ts-context PyTrailerWidget
-#: main.py:65
+#: main.py:79
 msgid "PyTrailer - Apple Trailer Downloader"
 msgstr "PyTrailer - Sťahovač upútaviek z apple.com"
 
 #. ts-context PyTrailerWidget
-#: main.py:88
+#: main.py:102
 msgid "Trailer"
 msgstr "Trailer"
 
 #. ts-context PyTrailerWidget
-#: main.py:88
+#: main.py:102
 msgid "Download status"
 msgstr "Stav sťahovania"
 
 #. ts-context PyTrailerWidget
-#: main.py:123
+#: main.py:137
 msgid "&File"
 msgstr "&Súbor"
 
 #. ts-context PyTrailerWidget
-#: main.py:125
+#: main.py:139
 msgid "Settings"
 msgstr "Nastavenia"
 
 #. ts-context PyTrailerWidget
-#: main.py:125
+#: main.py:139
 msgctxt "File|Settings"
 msgid "Ctrl+S"
 msgstr "Ctrl+S"
 
 #. ts-context PyTrailerWidget
-#: main.py:128
+#: main.py:142
 msgid "Quit"
 msgstr "Ukonči"
 
 #. ts-context PyTrailerWidget
-#: main.py:128
+#: main.py:142
 msgctxt "File|Quit"
 msgid "Ctrl+Q"
 msgstr "Ctrl+Q"
 
 #. ts-context PyTrailerWidget
-#: main.py:132
+#: main.py:146
 msgid "&Movies"
 msgstr "&Filmy"
 
 #. ts-context PyTrailerWidget
-#: main.py:138
+#: main.py:152
 msgid "&Help"
 msgstr "&Pomoc"
 
 #. ts-context PyTrailerWidget
-#: main.py:140
+#: main.py:154
 msgid "&About"
 msgstr "&O aplikácii"
 
 #. ts-context PyTrailerWidget
-#: main.py:140
+#: main.py:154
 msgctxt "Help|About PyQTrailer"
 msgid "Ctrl+A"
 msgstr "Ctrl+A"
 
 #. ts-context PyTrailerWidget
-#: main.py:266
+#: main.py:361
 msgid "done"
 msgstr "hotovo"
 
 #. ts-context PyTrailerWidget
-#: main.py:268
+#: main.py:363
 msgid "Done"
 msgstr "Hotovo"
 
 #. ts-context PyTrailerWidget
-#: main.py:270
+#: main.py:365
 msgid "Error"
 msgstr "Chyba"
 
 #. ts-context PyTrailerWidget
-#: main.py:272
+#: main.py:367
 msgid "Waiting"
 msgstr "Čakám"
 
 #. ts-context PyTrailerWidget
-#: main.py:274
+#: main.py:369
 msgid "Unknown"
 msgstr "Neznámy"
+
+#. ts-context PyTrailerWidget
+#: main.py:389
+msgid "Player error"
+msgstr "Chyba prehrávača"
+
+#. ts-context PyTrailerWidget
+#: main.py:389
+msgid ""
+"Player indicates error while playing selected trailer.\n"
+"Please verify player configuration is correct.\n"
+"For player error output see log file\n"
+msgstr ""
+"Nastala chyba prehrávania zvolenej ukážky\n"
+"Prosím overte nastavenie prehrávača\n"
+"Pre detailné informácie o chybe pozrite súbor záznamov"
+
+#. ts-context PyTrailerWidget
+#: main.py:424
+msgid "Player executable not found"
+msgstr "Prehrávač nebol nájdený"
+
+#. ts-context PyTrailerWidget
+#: main.py:424
+msgid ""
+"Player could not be run.\n"
+"Please verify player configuration is correct"
+msgstr ""
+"Prehrávač sa nepodarilo spustiť\n"
+"Prosím overte nastavenie prehrávača"
+
+#. ts-context PyTrailerWidget
+#: main.py:428
+msgid "Player execution failure"
+msgstr "Chyba spustenia prehrávača"
+
+#. ts-context PyTrailerWidget
+#: main.py:428
+msgid "Unknown error while running player."
+msgstr "Neznáma chyba počas prehrávania."
+
+#. ts-context PyTrailerWidget
+#: main.py:464
+msgid "Network error"
+msgstr "Chyba siete"
+
+#. ts-context PyTrailerWidget
+#: main.py:464
+msgid ""
+"There was a network problem when downloading movie list.\n"
+"Please check your network settings.\n"
+msgstr ""
+"Pri sťahovaní zoznamu ukážok došlo k chybe siete\n"
+"Prosím overte pripojenie na internet"
 
 #. ts-context Search
 #: search_ui.py:43

@@ -1,3 +1,13 @@
+2011-01-29  Version 0.6.X Stanislav Ochotnicky  <sochotnicky@gmail.com>
+
+	Added sk_SK translations for new messages
+
+2011-01-26  Version 0.6.1 Stanislav Ochotnicky  <sochotnicky@gmail.com>
+
+	Features added:
+	* Better handling of exceptions/problems
+	* Logging included (finally)
+
 2010-11-28  Version 0.6.0  Stanislav Ochotnicky  <sochotnicky@gmail.com>
 	Requires >= pytrailer-0.6.0
 
