@@ -1,6 +1,7 @@
-2011-01-29  Version 0.6.X Stanislav Ochotnicky  <sochotnicky@gmail.com>
+2011-01-29  Version 0.6.2 Stanislav Ochotnicky  <sochotnicky@gmail.com>
 
-	Added sk_SK translations for new messages
+	* Added sk_SK translations for new messages
+	* Fixed build race condition
 
 2011-01-26  Version 0.6.1 Stanislav Ochotnicky  <sochotnicky@gmail.com>
 
