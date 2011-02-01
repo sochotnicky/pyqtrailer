@@ -21,7 +21,7 @@ def regen_messages():
             po_files.append('-o')
             outFile = filename.replace(".po",'.qm')
             command = ["lconvert", '-i', "po/%s" % filename, '-o', "po/%s" % outFile]
-            subprocess.Popen(command)
+            subprocess.call(command)
 
 
 class build_py(_build_py):
@@ -33,7 +33,7 @@ class build_py(_build_py):
         for ui in self.uis:
             out = ui.replace('.ui','_ui.py')
             command = ["pyuic4","-o",out, ui]
-            subprocess.Popen(command)
+            subprocess.call(command)
             self.byte_compile(out)
         res = "pyqtrailer/qtcustom/resources.py"
 
@@ -42,7 +42,7 @@ class build_py(_build_py):
         if sys.version_info[0] == 3:
             command.append('-py3')
 
-        subprocess.Popen(command)
+        subprocess.call(command)
         regen_messages()
         _build_py.run(self)
 
@@ -53,7 +53,7 @@ setup(name='pyqtrailer',
       author_email='sochotnicky@gmail.com',
       url='http://github.com/sochotnicky/pyqtrailer',
       requires=["pytrailer"],
-      install_requires=['pytrailer>=0.5',"python-dateutil >= 1.5"],
+      install_requires=['pytrailer>=0.6',"python-dateutil >= 1.5"],
       classifiers=['Development Status :: 4 - Beta',
                    'License :: OSI Approved :: GNU General Public License (GPL)',
                    'Programming Language :: Python :: 2.6',
